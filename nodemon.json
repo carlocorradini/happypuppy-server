@@ -1,0 +1,17 @@
+{
+  "restartable": "rs",
+  "colours": true,
+  "verbose": true,
+  "ext": "ts",
+  "exec": "npx ts-node ./src/app.ts",
+  "watch": [
+    "./src/*",
+    ".env"
+  ],
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    ".git",
+    "node_modules"
+  ]
+}

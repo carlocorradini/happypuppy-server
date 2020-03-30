@@ -1,0 +1,2313 @@
+openapi: 3.0.0
+servers:
+  - url: https://filmy-19.herokuapp.com/api/v1
+    description: Production server
+  - url: http://localhost:8080/api/v1
+    description: Local test server
+info:
+  title: Filmy
+  version: 1.0.0
+  description: This is a server that let io get, insert, update and delete information about films and actors
+  contact:
+    email: carlo.corradini@studenti.unitn.it
+  license:
+    name: MIT
+    url: "https://opensource.org/licenses/MIT"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
+tags:
+  - name: film
+    description: all the  end points related to films
+  - name: actor
+    description: all the end points related to actor
+  - name: user
+    description: all the end points related to users
+  - name: authentication
+    description: all the end points related to authentication
+  - name: status
+    description: all the end points related to status
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    film:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        status_code:
+          type: integer
+          format: int32
+          example: 200
+        status_message:
+          type: string
+          example: Success
+        metadata:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            title:
+              type: string
+              example: "Spider-Man: Far from Home"
+            rating:
+              type: integer
+              format: int32
+              example: 76
+            release_date:
+              type: string
+              format: date
+              example: 2019-06-26
+            poster:
+              type: string
+              example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/lcq8dVxeeOqHvvgcte707K0KVx5.jpg
+            actors:
+              type: array
+              items:
+                type: integer
+                format: int32
+                example: 1
+    actor:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status_code:
+          type: integer
+          format: int32
+          example: 200
+        status_message:
+          type: string
+          example: Success
+        metadata:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            name:
+              type: string
+              example: Tom
+            surname:
+              type: string
+              example: Holland
+            gender:
+              type: string
+              example: M
+            birth_date:
+              type: string
+              format: date
+              example: 1996-06-01
+            death_date:
+              type: string
+              format: nullable
+            profile:
+              type: string
+              example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/ip7aXVH8s6wXv8cY6KI14OZgCI8.jpg
+            films:
+              type: array
+              items:
+                type: integer
+                format: int32
+                example: 1
+    user:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status_code:
+          type: integer
+          format: int32
+          example: 200
+        status_message:
+          type: string
+          example: Success
+        metadata:
+          type: object
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+            name:
+              type: string
+              example: mario
+            surname:
+              type: string
+              example: rossi
+            username:
+              type: string
+              example: admin
+            email:
+              type: string
+              example: mario.rossi@gmail.com
+    authentication:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status_code:
+          type: integer
+          format: int32
+          example: 200
+        status_message:
+          type: string
+          example: Success
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwODQ0YThjLTdiYTctNGQxYS1hZGVhLWU4ODFiNmE5ZjMxMSIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE1NzUyODA2MjYsImV4cCI6MTU3NTI4NDIyNn0.K0aknnEJazNH1Kan3DjdHnkjCO-_M80tiNqWcSF-BFQ
+paths:
+  #film-------------------------------------------------------------------------------------------------------------------
+  /film:
+    get:
+      tags:
+        - film
+      summary: get all films
+      description: endpoint that is going do give back all the films saved in the database
+      parameters:
+        - in: query
+          name: limit
+          description: limit the number of results to a limit value
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: offset
+          description: give an offsetValue value the results
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: title
+          description: filter the films by title (this parameter is case sensitive)
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: release_year
+          description: filter the films by release year (YYYY)
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: rating
+          description: get all the films with a rating grater then the value inserted (extremes not included)
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: everything went good, and the server is going to return a list with all the films
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        format: int32
+                        example: 1
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          format: int32
+                          example: 1
+                        title:
+                          type: string
+                          example: Spider-Man Far from Home
+                        rating:
+                          type: integer
+                          format: int32
+                          example: 76
+                        release_date:
+                          type: string
+                          format: date
+                          example: 2019-06-26
+                        poster:
+                          type: string
+                          example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/lcq8dVxeeOqHvvgcte707K0KVx5.jpg
+                        actors:
+                          type: array
+                          items:
+                            type: integer
+                            format: int32
+                            example: 1
+        400:
+          description: something went wrong! there is a problem with request (example limit or offset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: -20 is not a valid limit
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    post:
+      tags:
+        - film
+      summary: add new film
+      description: given the information about a new film the endpoint id going to add the film in the database
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                  type: string
+                  example: john wick
+                rating:
+                  type: integer
+                  format: int32
+                  example: 80
+                release_date:
+                  type: string
+                  format: date
+                  example: 2019-10-10
+                poster:
+                  type: string
+                  example: https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.jpg
+      responses:
+        201:
+          description: everything went good, the film was successful added in the database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  status_message:
+                    type: string
+                    example: Resource created
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: blax
+                      rating:
+                        type: integer
+                        format: int32
+                        example: 10
+                      release_date:
+                        type: string
+                        format: date
+                        example: 2019-10-10
+                      poster:
+                        type: string
+                        example: https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.jpg
+                      id:
+                        type: integer
+                        format: int32
+                        example: 6
+                      create_date:
+                        type: string
+                        example: 2019-11-29T14:31:30.669Z
+                      update_date:
+                        type: string
+                        example: 2019-11-29T14:31:30.669Z
+        400:
+          description: something went wrong! there is a problem with the request (example limit or offset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          example: not_an_url
+                        property:
+                          type: string
+                          example: profile
+                        constraints:
+                          type: object
+                          properties:
+                            isUrl:
+                              type: string
+                              example: profile must be an URL address
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+  /film/{filmID}:
+    get:
+      tags:
+        - film
+      summary: get film by id
+      description: endpoint that is going do give back all the information about a specific film given the id
+      parameters:
+        - in: path
+          name: filmID
+          description: give the id of the film that you want
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: everything went good, and the server is going to return all the information about the specified film
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int32
+                        example: 1
+                      title:
+                        type: string
+                        example: Spider-Man Far from Home
+                      rating:
+                        type: integer
+                        format: int32
+                        example: 76
+                      release_date:
+                        type: string
+                        format: date
+                        example: 2019-06-26
+                      poster:
+                        type: string
+                        example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/lcq8dVxeeOqHvvgcte707K0KVx5.jpg
+                      actors:
+                        type: array
+                        items:
+                          type: integer
+                          format: int32
+                          example: 1
+        400:
+          description: something went wrong! there is a problem with request (example not valid id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: string is not a valid identifier
+        404:
+          description: something went wrong! film not found, try checking the filmID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Unable to find a Film with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    put:
+      tags:
+        - film
+      summary: update film by id
+      description: endpoint that let you modify a specific film
+      parameters:
+        - in: path
+          name: filmID
+          description: give the id of the film that you want to modify
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                  type: string
+                  example: john wick
+                rating:
+                  type: integer
+                  format: int32
+                  example: 80
+                release_date:
+                  type: string
+                  format: date
+                  example: 2019-10-10
+                poster:
+                  type: string
+                  example: https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.jpg
+      responses:
+        200:
+          description: everything went good, the film update was successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int32
+                        example: 4
+                      title:
+                        type: string
+                        example: John Wick 2
+                      rating:
+                        type: integer
+                        format: int32
+                        example: 80
+                      release_date:
+                        type: string
+                        example: 2019-10-10T00:00:00.000Z
+                      poster:
+                        type: string
+                        example: https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.png
+                      update_date:
+                        type: string
+                        example: 2019-11-30T15:14:17.319Z
+        400:
+          description: something went wrong! there is a problem with request (example not valid url)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          example: not_an_url
+                        property:
+                          type: string
+                          example: poster
+                        constraints:
+                          type: object
+                          properties:
+                            isUrl:
+                              type: string
+                              example: poster must be an URL address
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! film not found, try checking the filmID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Unable to find a Film with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+    delete:
+      tags:
+        - film
+      summary: delete film by id
+      description: endpoint that let you delete a specific film
+      parameters:
+        - in: path
+          name: filmID
+          description: give the id of the film that you want to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: []
+      responses:
+        202:
+          description: everything went good, the specified film was deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 202
+                  status_message:
+                    type: string
+                    example: Request accepted
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int32
+                        example: 6
+                      title:
+                        type: string
+                        example: John Wick 2
+                      rating:
+                        type: integer
+                        format: int32
+                        example: 80
+                      release_date:
+                        type: string
+                        format: date
+                        example: 2019-10-10
+                      poster:
+                        type: string
+                        example: https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.jpg
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! film not found, try checking the filmID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Unable to find a Film with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+  #actor-------------------------------------------------------------------------------------------------------------------
+  /actor:
+    get:
+      tags:
+        - actor
+      summary: get all actrors
+      description: endpoint that is going do give back all the actrors saved in the database
+      parameters:
+        - in: query
+          name: limit
+          description: limit the number of results to a limit value
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: offset
+          description: give an offsetValue value the results
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: name
+          description: filter the actrors by name (this parameter is case sensitive)
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: surname
+          description: filter the actrors by surname (this parameter is case sensitive)
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: gender
+          description: filter the actrors by gender (F for female and M for male)
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: birth_year
+          description: filter the actror by birth year (YYYY)
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: death_year
+          description: filter the actror by death_year, you are going to get all the actor that die in a specific year (YYYY)
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: everything went good, and the server is going to return a list with all the actors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        format: int32
+                        example: 1
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          format: int32
+                          example: 1
+                        name:
+                          type: string
+                          example: Tom
+                        surname:
+                          type: string
+                          example: Holland
+                        gender:
+                          type: string
+                          example: M
+                        birth_date:
+                          type: string
+                          format: date
+                          example: 1996-06-01
+                        death_date:
+                          type: string
+                          format: nullable
+                        profile:
+                          type: string
+                          example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/ip7aXVH8s6wXv8cY6KI14OZgCI8.jpg
+                        films:
+                          type: array
+                          items:
+                            type: integer
+                            format: int32
+                            example: 1
+        400:
+          description: something went wrong! there is a problem with request (example limit or offset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: -20 is not a valid limit
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    post:
+      tags:
+        - actor
+      summary: add new actor
+      description: given the information about a new actor the endpoint is going to add the actor in the database
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: Keanu
+                surname:
+                  type: string
+                  example: Reeves
+                gender:
+                  type: string
+                  example: M
+                birth_date:
+                  type: string
+                  format: date
+                  example: 1964-09-02
+                profile:
+                  type: string
+                  example: http://instagram.com/Keanu%20Reeves
+      responses:
+        201:
+          description: everything went good, the actor was successful added in the database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  status_message:
+                    type: string
+                    example: Resource created
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Keanu
+                      surname:
+                        type: string
+                        example: Reeves
+                      gender:
+                        type: string
+                        example: M
+                      birth_date:
+                        type: string
+                        format: date
+                        example: 1964-09-02
+                      profile:
+                        type: string
+                        example: http://instagram.com/Keanu%20Reeves
+                      death_date:
+                        type: string
+                        format: nullable
+                      id:
+                        type: integer
+                        format: int32
+                        example: 3
+                      create_date:
+                        type: string
+                        example: 2019-12-02T10:40:38.678Z
+                      update_date:
+                        type: string
+                        example: 2019-12-02T10:40:38.678Z
+        400:
+          description: something went wrong! there is a problem with request (example not valid url)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          example: not_an_url
+                        property:
+                          type: string
+                          example: profile
+                        constraints:
+                          type: object
+                          properties:
+                            isUrl:
+                              type: string
+                              example: profile must be an URL address
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+  /actor/{actorID}:
+    get:
+      tags:
+        - actor
+      summary: get actor by id
+      description: endpoint that is going do give back all the information about a specific actor given the id
+      parameters:
+        - in: path
+          name: actorID
+          description: give the id of the actor that you want
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: everything went good, and the server is going to return all the information about the specified actror
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int32
+                        example: 1
+                      name:
+                        type: string
+                        example: Tom
+                      surname:
+                        type: string
+                        example: Holland
+                      gender:
+                        type: string
+                        example: M
+                      birth_date:
+                        type: string
+                        format: date
+                        example: 1996-06-01
+                      death_date:
+                        type: string
+                        format: nullable
+                      profile:
+                        type: string
+                        example: https://image.tmdb.org/t/p/w600_and_h900_bestv2/ip7aXVH8s6wXv8cY6KI14OZgCI8.jpg
+                      films:
+                        type: array
+                        items:
+                          type: integer
+                          format: int32
+                          example: 1
+        400:
+          description: something went wrong! there is a problem with request (example bot valid id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: string is not a valid identifier
+        404:
+          description: something went wrong! actor not found, try checking the actorID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an Actor with the specified identifier
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    put:
+      tags:
+        - actor
+      summary: update actror by id
+      description: endpoint that let you modify a specific actor
+      parameters:
+        - in: path
+          name: actorID
+          description: give the id of the actor that you want to modify
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: Keanu
+                surname:
+                  type: string
+                  example: Reeves
+                gender:
+                  type: string
+                  example: M
+                birth_date:
+                  type: string
+                  format: date
+                  example: 1964-09-02
+                profile:
+                  type: string
+                  example: http://instagram.com/Keanu%20Reeves
+      responses:
+        200:
+          description: everything went good, the actor update was successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int32
+                        example: 3
+                      name:
+                        type: string
+                        example: Keanu
+                      surname:
+                        type: string
+                        example: Reeves
+                      gender:
+                        type: string
+                        example: M
+                      birth_date:
+                        type: string
+                        example: 1964-09-02T00:00:00.000Z
+                      death_date:
+                        type: string
+                        format: nullable
+                      profile:
+                        type: string
+                        example: http://instagram.com/Keanu%20Reeves
+                      update_date:
+                        type: string
+                        example: 2019-12-02T11:08:02.454Z
+        400:
+          description: something went wrong! there is a problem with request (example not valid url)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          example: not_an_url
+                        property:
+                          type: string
+                          example: poster
+                        constraints:
+                          type: object
+                          properties:
+                            isUrl:
+                              type: string
+                              example: poster must be an URL address
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! actor not found, try checking the actorID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an Actor with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+    delete:
+      tags:
+        - actor
+      summary: delete actror by id
+      description: endpoint that let you delete a specific actor
+      parameters:
+        - in: path
+          name: actorID
+          description: give the id of the actor that you want to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: []
+      responses:
+        202:
+          description: everything went good, the specified actor was deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 202
+                  status_message:
+                    type: string
+                    example: Request accepted
+                  data:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      status_code:
+                        type: integer
+                        format: int32
+                        example: 202
+                      status_message:
+                        type: string
+                        example: Request accepted
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            format: int32
+                            example: 3
+                          name:
+                            type: string
+                            example: Keanu
+                          surname:
+                            type: string
+                            example: Reeves
+                          gender:
+                            type: string
+                            example: M
+                          birth_date:
+                            type: string
+                            format: date
+                            example: 1964-09-02
+                          death_date:
+                            type: string
+                            format: nullable
+                          profile:
+                            type: string
+                            example: http://instagram.com/Keanu%20Reeves
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! actor not found, try checking the actorID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an Actor with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+  #user-------------------------------------------------------------------------------------------------------------------
+  /user:
+    get:
+      tags:
+        - user
+      summary: get all users
+      description: endpoint that is going do give back all the users saved in the database
+      parameters:
+        - in: query
+          name: limit
+          description: limit the number of results to a limit value
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            example: 0
+        - in: query
+          name: offset
+          description: give an offsetValue value the results
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            example: 0
+      responses:
+        200:
+          description: everything went good, and the server is going to return a list with all the users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        format: int32
+                        example: 1
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 20844a8c-7ba7-4d1a-adea-e881b6a9f311
+                        name:
+                          type: string
+                          example: admin
+                        surname:
+                          type: string
+                          example: admin
+                        username:
+                          type: string
+                          example: admin
+                        email:
+                          type: string
+                          example: admin@gmail.com
+        400:
+          description: something went wrong! there is a problem with request (example limit or offset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: -20 is not a valid limit
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    post:
+      tags:
+        - user
+      summary: add new user
+      description: given the information about a new user the endpoint is going to add the user in the database
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: mario
+                surname:
+                  type: string
+                  example: rossi
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: $2a$10$yyc1wN2NBgMF4sCF6X4qL.iAXsYtYKRCWwjjWUysnOqv3g/ZSxLUG
+                email:
+                  type: string
+                  example: mario.rossi@gmail.com
+      responses:
+        201:
+          description: everything went good, the user was successful added in the database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  status_message:
+                    type: string
+                    example: Resource created
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: test
+                      surname:
+                        type: string
+                        example: test
+                      username:
+                        type: string
+                        example: test
+                      email:
+                        type: string
+                        example: test@gmail.com
+                      password:
+                        type: string
+                        example: $2a$10$vY3gwxsISx7B/J7ym7kG2ONU4eFrs33cg/HT3FukoXLpoOr/.LhLi
+                      id:
+                        type: string
+                        example: 738a88e8-17e7-4e29-80d0-12f041aa6280
+                      create_date:
+                        type: string
+                        example: 2019-12-02T11:58:07.111Z
+                      update_date:
+                        type: string
+                        example: 2019-12-02T11:58:07.111Z
+        400:
+          description: something went wrong! there is a problem with request (example not valid email)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value:
+                          type: string
+                          example: not_email
+                        property:
+                          type: string
+                          example: profile
+                        constraints:
+                          type: object
+                          properties:
+                            isEmail:
+                              type: string
+                              example: email must be an email
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+  /user/{userID}:
+    get:
+      tags:
+        - user
+      summary: get user by id
+      description: endpoint that is going do give back all the information about a specific user given the id
+      parameters:
+        - in: path
+          name: userID
+          description: give the id of the user that you want
+          required: true
+          schema:
+            type: string
+            example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+      responses:
+        200:
+          description: everything went good, and the server is going to return all the information about the specified user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  metadata:
+                    type: object
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+                      name:
+                        type: string
+                        example: mario
+                      surname:
+                        type: string
+                        example: rossi
+                      username:
+                        type: string
+                        example: admin
+                      email:
+                        type: string
+                        example: mario.rossi@gmail.com
+        400:
+          description: something went wrong! there is a problem with request (example not valid id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: 1 is not a valid identifier
+        404:
+          description: something went wrong! user not found, try checking the userID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an User with the specified identifier
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+    put:
+      tags:
+        - user
+      summary: update user by id
+      description: endpoint that let you modify a specific user
+      parameters:
+        - in: path
+          name: userID
+          description: give the id of the user that you want to modify
+          required: true
+          schema:
+            type: string
+            example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: mario
+                surname:
+                  type: string
+                  example: rossi
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: $2a$10$yyc1wN2NBgMF4sCF6X4qL.iAXsYtYKRCWwjjWUysnOqv3g/ZSxLUG
+                email:
+                  type: string
+                  example: mario.rossi@gmail.com
+      responses:
+        200:
+          description: everything went good, the user update was successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+                      name:
+                        type: string
+                        example: mario
+                      surname:
+                        type: string
+                        example: rossi
+                      username:
+                        type: string
+                        example: admin
+                      email:
+                        type: string
+                        example: mario.rossi@gmail.com
+                      password:
+                        type: string
+                        example: $2a$10$FA8tTeGCTk3xJ.hFDAbuA.CYpcHSiFmQxUf3P9NGvOQpYuGDgJwNG
+                      update_date:
+                        type: string
+                        example: 2019-12-02T12:11:40.269Z
+        400:
+          description: something went wrong! there is a problem with request (example limit or offset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: 1 is not a valid identifier
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! user not found, try checking the userID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an user with id 1
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal Server error
+                  error_message:
+                    type: string
+                    example: duplicate key value violates unique constraint UQ_211fd309ee6b6627b1cb46ba003
+    delete:
+      tags:
+        - user
+      summary: delete user by id
+      description: endpoint that let you delete a specific user
+      parameters:
+        - in: path
+          name: userID
+          description: give the id of the user that you want to delete
+          required: true
+          schema:
+            type: string
+            example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+      security:
+        - bearerAuth: []
+      responses:
+        202:
+          description: everything went good, the specified user was deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 202
+                  status_message:
+                    type: string
+                    example: Request accepted
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ed2e46bb-be58-46ac-82c7-ec07281c3176
+                      name:
+                        type: string
+                        example: mario
+                      surname:
+                        type: string
+                        example: rossi
+                      username:
+                        type: string
+                        example: miraxh
+                      email:
+                        type: string
+                        example: miraxh98@gmail.com
+        400:
+          description: something went wrong! there is a problem with request (example not valid id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+                  error_message:
+                    type: string
+                    example: 1 is not a valid identifier
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Authorization Token
+        404:
+          description: something went wrong! user not found, try checking the userID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 404
+                  status_message:
+                    type: string
+                    example: Resource not found
+                  error_message:
+                    type: string
+                    example: Cannot find an User with id ed2f46db-be58-46bc-82c7-ec07281c3176
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+  #authentication-------------------------------------------------------------------------------------------------------------------
+  /auth/signin:
+    post:
+      tags:
+        - authentication
+      summary: get authentication Token
+      description: given username and the password the endpoint is going to give back an authentication Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: password
+      responses:
+        200:
+          description: everything went good, the server is going to give a valid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  status_message:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwODQ0YThjLTdiYTctNGQxYS1hZGVhLWU4ODFiNmE5ZjMxMSIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE1NzUyODA2MjYsImV4cCI6MTU3NTI4NDIyNn0.K0aknnEJazNH1Kan3DjdHnkjCO-_M80tiNqWcSF-BFQ
+        400:
+          description: something went wrong! there is a problem with request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  status_message:
+                    type: string
+                    example: Invalid request message
+        401:
+          description: something went wrong! you are not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 401
+                  status_message:
+                    type: string
+                    example: Unauthorized request
+                  error_message:
+                    type: string
+                    example: Invalid Credentials
+        500:
+          description: something went wrong! there is an internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false=
+                  status_code:
+                    type: integer
+                    format: int32
+                    example: 500
+                  status_message:
+                    type: string
+                    example: Internal server error
+  /status:
+    get:
+      tags:
+        - status
+      summary: get API status
+      description: this end point returns the code 200 only in the api are working
+      responses:
+        200:
+          description: everything went good, the APIs are working

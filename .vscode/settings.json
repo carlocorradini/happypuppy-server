@@ -1,0 +1,20 @@
+{
+    "files.eol": "\n",
+    "files.associations": {
+        ".huskyrc": "json",
+        ".lintstagedrc": "json"
+    },
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true
+    },
+    "[javascript]": {
+        "editor.formatOnSave": false,
+    },
+    "[typescript]": {
+        "editor.formatOnSave": false,
+    }
+}
