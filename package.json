@@ -19,8 +19,8 @@
     "prebuild": "npm run clean",
     "build": "npx tsc --p ./tsconfig.json",
     "postbuild": "npx ts-node ./tools/build",
-    "test": "npx jest",
-    "test:staged": "npx jest --bail --findRelatedTests",
+    "test": "exit 1 || npx jest",
+    "test:staged": "exit 1 || npx jest --bail --findRelatedTests",
     "prestart": "cd build && npm install --only=prod",
     "start": "npx cross-env NODE_ENV=\"production\" node -r tsconfig-paths/register ./build/app.js",
     "start:dev": "npx ts-node-dev -r tsconfig-paths/register --ignore-watch node_module --respawn --transpileOnly src/app.ts"
