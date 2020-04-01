@@ -4,13 +4,7 @@ import shell from 'shelljs';
 const BUILD_FOLDER = 'build/';
 
 const FOLDERS = new Set(['./src/public']);
-const FILES = new Set([
-  'LICENSE',
-  'README.md',
-  'package.json',
-  'package-lock.json',
-  'tsconfig.json',
-]);
+const FILES = new Set(['LICENSE', 'package.json', 'package-lock.json']);
 
 // Copy Folders
 FOLDERS.forEach((folder) => {
