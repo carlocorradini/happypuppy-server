@@ -1,16 +1,15 @@
 import path from 'path';
 import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import config from '../config';
 
 const logger = createLogger({
-  level: config.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
   exitOnError: false,
   format: format.combine(
     format.label({
       label: path.basename(process.mainModule !== undefined ? process.mainModule.filename : '?'),
     }),
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' })
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:SSS' })
   ),
   transports: [
     new transports.Console({
@@ -31,7 +30,7 @@ const logger = createLogger({
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '1m',
-      maxFiles: '14d',
+      maxFiles: '16d',
       format: format.combine(
         format.printf(
           (info) => `${info.timestamp} ${info.level.toUpperCase()} [${info.label}]: ${info.message}`
@@ -41,6 +40,6 @@ const logger = createLogger({
   ],
 });
 
-logger.debug('Logger created');
+logger.debug(`Logger initialized at ${logger.level} level`);
 
 export default logger;

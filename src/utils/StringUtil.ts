@@ -1,5 +1,5 @@
 export default class StringUtil {
-  private static readonly ALPHABET: string =
+  public static readonly ALPHABET: string =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
 
   private static readonly ALPHABET_LENGTH: number = StringUtil.ALPHABET.length;

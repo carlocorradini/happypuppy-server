@@ -2,7 +2,7 @@
 import { Dictionary } from 'express-serve-static-core';
 import { Repository, EntityRepository } from 'typeorm';
 import { validate } from 'class-validator';
-import User from '../entity/User';
+import User from '@app/db/entity/User';
 
 @EntityRepository(User)
 export default class FilmRepository extends Repository<User> {
@@ -23,6 +23,7 @@ export default class FilmRepository extends Repository<User> {
         target: false,
       },
     });
+
     return new Promise((resolve, reject) => {
       if (errors.length > 0) {
         reject(errors);

@@ -10,7 +10,7 @@ import {
   BeforeUpdate,
 } from 'typeorm';
 import { IsString, MinLength, MaxLength, IsEmail } from 'class-validator';
-import { CryptUtil } from '../../utils';
+import { CryptUtil } from '@app/utils';
 
 @Entity('user')
 export default class User {
@@ -43,15 +43,15 @@ export default class User {
 
   @Column({ name: 'password', length: 72, select: false })
   @IsString()
-  @MinLength(8) // Real password min length
-  @MaxLength(128) // Real password max length
+  @MinLength(8) // clear password min length
+  @MaxLength(64) // clear password max length
   password!: string;
 
-  @CreateDateColumn({ name: 'create_date', select: false, update: false })
-  create_date!: Date;
+  @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  created_at!: Date;
 
-  @UpdateDateColumn({ name: 'update_date', select: false })
-  update_date!: Date;
+  @UpdateDateColumn({ name: 'updated_at', select: false })
+  updated_at!: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

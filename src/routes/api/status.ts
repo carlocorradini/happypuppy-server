@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Router, Request, Response } from 'express';
-import { StatusCode } from '../../../response';
+import { StatusCode } from '@app/response';
 
 const router = Router();
 
-const status = (req: Request, res: Response) => {
+const status = (_req: Request, res: Response) => {
   res.status(StatusCode.OK).end();
 };
 

@@ -1,13 +1,13 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import User from '../db/entity/User';
-import { CryptUtil, JWTUtil, APIUtil } from '../utils';
-import { StatusCode, generateResponse } from '../response';
-import logger from '../logger';
+import logger from '@app/logger';
+import User from '@app/db/entity/User';
+import { CryptUtil, JWTUtil, APIUtil } from '@app/utils';
+import { StatusCode, generateResponse } from '@app/response';
 
 export default class AuthController {
-  public static async signIn(req: Request, res: Response) {
+  public static async auth(req: Request, res: Response) {
     let response: { statusCode: StatusCode; data: any } = {
       statusCode: StatusCode.INTERNAL_SERVER_ERROR,
       data: '',

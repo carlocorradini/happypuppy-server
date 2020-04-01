@@ -1,22 +1,14 @@
-/* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import {
-  getRepository,
-  getCustomRepository,
-  QueryFailedError,
-  Like,
-  Between,
-  MoreThanOrEqual,
-} from 'typeorm';
+import { getRepository, getCustomRepository, QueryFailedError } from 'typeorm';
 import { validateOrReject } from 'class-validator';
-import FilmRepository from '../db/repository/FilmRepository';
-import Film from '../db/entity/Film';
-import { APIUtil } from '../utils';
-import { StatusCode, generateResponse } from '../response';
-import { InvalidParamError } from '../utils/errors';
+import { APIUtil } from '@app/utils';
+import { InvalidParamError } from '@app/utils/errors';
+import UserRepository from '@app/db/repository/UserRepository';
+import User from '@app/db/entity/User';
+import { StatusCode, generateResponse } from '@app/response';
 
-export default class FilmController {
+export default class UserController {
   public static async getOne(req: Request, res: Response) {
     let response: { statusCode: StatusCode; data: any } = {
       statusCode: StatusCode.INTERNAL_SERVER_ERROR,
@@ -24,17 +16,17 @@ export default class FilmController {
     };
 
     try {
-      const id = await APIUtil.id(req.params.id);
-      const film: Film = await getRepository(Film).findOneOrFail({ id }, { loadRelationIds: true });
+      const id = await APIUtil.uuid(req.params.id);
+      const user: User = await getRepository(User).findOneOrFail({ id });
 
-      response = { statusCode: StatusCode.OK, data: film };
+      response = { statusCode: StatusCode.OK, data: user };
     } catch (ex) {
       if (ex instanceof InvalidParamError) {
         response = { statusCode: StatusCode.BAD_REQUEST, data: ex.message };
       } else if (ex instanceof Error && ex.name === 'EntityNotFound') {
         response = {
           statusCode: StatusCode.NOT_FOUND,
-          data: `Cannot find a Film with the specified identifier`,
+          data: `Cannot find an User with the specified identifier`,
         };
       } else if (ex instanceof QueryFailedError) {
         response = { statusCode: StatusCode.INTERNAL_SERVER_ERROR, data: ex.message };
@@ -53,30 +45,12 @@ export default class FilmController {
     try {
       const limit = await APIUtil.limit(req.query.limit);
       const offset = await APIUtil.offset(req.query.offset);
-      const { title, release_year, rating } = req.query;
-
-      if (release_year !== undefined && Number.isNaN(parseInt(release_year, 10)))
-        throw new InvalidParamError(`Invalid release_year, received ${release_year}`);
-      if (rating !== undefined && Number.isNaN(parseInt(rating, 10)))
-        throw new InvalidParamError(`Invalid rating, received ${rating}`);
-
-      const films: Film[] = await getRepository(Film).find({
+      const users: User[] = await getRepository(User).find({
         take: limit,
         skip: offset,
-        loadRelationIds: true,
-        where: {
-          ...(title !== undefined && { title: Like(`${title}%`) }),
-          ...(release_year !== undefined && {
-            release_date: Between(
-              new Date(`${release_year}-01-01`),
-              new Date(`${release_year}-12-31`)
-            ),
-          }),
-          ...(rating !== undefined && { rating: MoreThanOrEqual(rating) }),
-        },
       });
 
-      response = { statusCode: StatusCode.OK, data: films };
+      response = { statusCode: StatusCode.OK, data: users };
     } catch (ex) {
       if (ex instanceof InvalidParamError) {
         response = { statusCode: StatusCode.BAD_REQUEST, data: ex.message };
@@ -95,10 +69,10 @@ export default class FilmController {
     };
 
     try {
-      let film: Film = await getCustomRepository(FilmRepository).createFromBodyOrFail(req.body);
-      film = await getRepository(Film).save(film);
+      let user: User = await getCustomRepository(UserRepository).createFromBodyOrFail(req.body);
+      user = await getRepository(User).save(user);
 
-      response = { statusCode: StatusCode.CREATED, data: film };
+      response = { statusCode: StatusCode.CREATED, data: user };
     } catch (ex) {
       if (Array.isArray(ex)) {
         response = { statusCode: StatusCode.BAD_REQUEST, data: ex };
@@ -111,21 +85,21 @@ export default class FilmController {
   }
 
   public static async delete(req: Request, res: Response) {
-    const id = await APIUtil.id(req.params.id);
-    const filmRepository = await getRepository(Film);
+    const { id } = req.params;
+    const userRepository = await getRepository(User);
     let response: { statusCode: StatusCode; data: any } = {
       statusCode: StatusCode.INTERNAL_SERVER_ERROR,
       data: '',
     };
 
     try {
-      const film: Film = await filmRepository.findOneOrFail({ id });
-      await filmRepository.delete({ id: film.id });
+      const user: User = await userRepository.findOneOrFail({ id });
+      await userRepository.delete({ id: user.id });
 
-      response = { statusCode: StatusCode.ACCEPTED, data: film };
+      response = { statusCode: StatusCode.ACCEPTED, data: user };
     } catch (ex) {
       if (ex instanceof Error && ex.name === 'EntityNotFound') {
-        response = { statusCode: StatusCode.NOT_FOUND, data: `Cannot find a Film with id ${id}` };
+        response = { statusCode: StatusCode.NOT_FOUND, data: `Cannot find an User with id ${id}` };
       } else if (ex instanceof QueryFailedError) {
         response = { statusCode: StatusCode.INTERNAL_SERVER_ERROR, data: ex.message };
       }
@@ -135,29 +109,29 @@ export default class FilmController {
   }
 
   public static async update(req: Request, res: Response) {
-    const id = await APIUtil.id(req.params.id);
-    const filmRepository = await getRepository(Film);
-    const newFilm: Film = await getCustomRepository(FilmRepository).createFromBody(req.body);
+    const { id } = req.params;
+    const userRepository = await getRepository(User);
+    const newUser: User = await getCustomRepository(UserRepository).createFromBody(req.body);
     let response: { statusCode: StatusCode; data: any } = {
       statusCode: StatusCode.INTERNAL_SERVER_ERROR,
       data: '',
     };
 
     try {
-      const film: Film = await filmRepository.findOneOrFail({ id });
-      await filmRepository.merge(film, newFilm);
-      await validateOrReject(film, {
+      const user: User = await userRepository.findOneOrFail({ id });
+      await userRepository.merge(user, newUser);
+      await validateOrReject(user, {
         forbidUnknownValues: true,
         validationError: {
           target: false,
         },
       });
-      await filmRepository.save(film);
+      await userRepository.save(user);
 
-      response = { statusCode: StatusCode.OK, data: film };
+      response = { statusCode: StatusCode.OK, data: user };
     } catch (ex) {
       if (ex instanceof Error && ex.name === 'EntityNotFound') {
-        response = { statusCode: StatusCode.NOT_FOUND, data: `Cannot find a Film with id ${id}` };
+        response = { statusCode: StatusCode.NOT_FOUND, data: `Cannot find an User with id ${id}` };
       } else if (Array.isArray(ex)) {
         response = { statusCode: StatusCode.BAD_REQUEST, data: ex };
       } else if (ex instanceof QueryFailedError) {

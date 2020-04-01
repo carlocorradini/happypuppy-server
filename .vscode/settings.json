@@ -4,17 +4,19 @@
         ".huskyrc": "json",
         ".lintstagedrc": "json"
     },
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true,
-    "editor.insertSpaces": true,
-    "editor.detectIndentation": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-        "source.fixAll": true
+        "source.fixAll.eslint": true,
     },
+    "eslint.validate": [
+        "javascript",
+        "typescript"
+    ],
+    "editor.formatOnSave": true,
     "[javascript]": {
-        "editor.formatOnSave": false,
+        "editor.formatOnSave": false
     },
     "[typescript]": {
-        "editor.formatOnSave": false,
+        "editor.formatOnSave": false
     }
 }

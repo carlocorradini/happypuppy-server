@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import path from 'path';
 // eslint-disable-next-line no-unused-vars
 import { createConnection, ConnectionOptions } from 'typeorm';
-import config from './config'; // ! Always first
-import logger from './logger';
-import { createServer } from './server';
+import config from '@app/config'; // ! Always first in entry point
+import Server from '@app/server';
+import logger from '@app/logger';
 
 createConnection(<ConnectionOptions>{
   type: config.DATABASE_TYPE,
@@ -18,12 +18,13 @@ createConnection(<ConnectionOptions>{
   subscribers: [path.join(__dirname, config.DATABASE_SUBSCRIBERS)],
 })
   .then(() => {
-    logger.info('Database connected');
-    return createServer(config.PORT);
+    logger.info(`Database connected`);
+    return Server.getInstance().listen(config.PORT);
   })
-  .then((port) => {
-    logger.info(`Server running on port ${port}`);
+  .then((addressInfo) => {
+    logger.info(`Server running at ${addressInfo.address} on port ${addressInfo.port}`);
   })
   .catch((ex) => {
     logger.error(ex.toString());
+    process.exit(1);
   });

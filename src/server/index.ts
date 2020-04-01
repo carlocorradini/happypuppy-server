@@ -1,4 +1,3 @@
-import createServer from './createServer';
-import configServer from './configServer';
+import Server from './server';
 
-export { createServer, configServer };
+export default Server;
