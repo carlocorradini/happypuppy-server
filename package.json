@@ -25,7 +25,7 @@
     "start": "npx cross-env NODE_ENV=\"production\" node app.js",
     "prestart:prod": "cd build && npm install --only=prod",
     "start:prod": "cd build && npx cross-env NODE_ENV=\"production\" node app.js",
-    "start:dev": "npx ts-node-dev -r tsconfig-paths/register --ignore-watch node_module --respawn --transpileOnly src/app.ts"
+    "start:dev": "npx ts-node-dev -r tsconfig-paths/register --watch src --ignore-watch node_modules --respawn --transpileOnly src/app.ts"
   },
   "author": "Carlo Corradini",
   "contributors": [
