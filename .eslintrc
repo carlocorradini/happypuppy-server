@@ -35,11 +35,6 @@
   "settings": {
     "import/resolver": {
       "typescript": {}
-    },
-    "settings": {
-      "react": {
-        "version": "999.999.999"
-      }
     }
   }
 }
