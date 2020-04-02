@@ -3,8 +3,8 @@ import path from 'path';
 // eslint-disable-next-line no-unused-vars
 import { createConnection, ConnectionOptions } from 'typeorm';
 import config from '@app/config'; // ! Always first
-import Server from '@app/server';
 import logger from '@app/logger';
+import Server from '@app/server';
 
 createConnection(<ConnectionOptions>{
   type: config.DATABASE_TYPE,

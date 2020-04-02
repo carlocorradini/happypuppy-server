@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-export interface Configuration {
+export interface Config {
   NODE_ENV: string;
   PORT: number;
   DATABASE_TYPE: string;
@@ -16,7 +16,7 @@ export interface Configuration {
 dotenv.config();
 
 // prettier-ignore
-const configuration: Configuration = {
+const config: Config = {
   NODE_ENV: process.env.NODE_ENV || 'production',
   PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 80,
   DATABASE_TYPE: process.env.DATABASE_TYPE || 'postgres',
@@ -29,4 +29,4 @@ const configuration: Configuration = {
   SECURITY_JWT_KEY: process.env.SECURITY_JWT_KEY || `2:<W_+3TJ-6ahMtv7LfgXc"XKxW4"Q&`,
 };
 
-export default configuration;
+export default config;
