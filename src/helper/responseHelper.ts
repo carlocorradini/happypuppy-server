@@ -1,20 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Response as ExpressResponse } from 'express';
 // eslint-disable-next-line no-unused-vars
-import StatusCode from './statusCode';
-import HttpStatusCode from './httpStatusCode';
-
-export enum RESPONSE_STATUS {
-  // eslint-disable-next-line no-unused-vars
-  SUCCESS = 'success',
-  // eslint-disable-next-line no-unused-vars
-  FAIL = 'fail',
-  // eslint-disable-next-line no-unused-vars
-  ERROR = 'error',
-}
+import StatusCode, { STATUS } from './statusCode';
 
 export interface Response {
-  status: RESPONSE_STATUS;
+  status: STATUS;
   // eslint-disable-next-line camelcase
   is_success: boolean;
   // eslint-disable-next-line camelcase
@@ -27,27 +17,15 @@ export interface Response {
 }
 
 export default class ResponseHelper {
-  public static send(res: ExpressResponse, statusCode: StatusCode, data?: any) {
+  public static send(res: ExpressResponse, statusCode: StatusCode, data?: any): void {
     res.status(statusCode.httpStatusCode.code).json(<Response>{
-      status: ResponseHelper.status(statusCode),
-      is_success: statusCode.isSuccessStatusCode(),
+      status: statusCode.status(),
+      is_success: statusCode.isSuccess(),
       http_status_code: statusCode.httpStatusCode.code,
       http_status_code_name: statusCode.httpStatusCode.name,
       status_code: statusCode.code,
       status_code_name: statusCode.name,
       data,
     });
-  }
-
-  private static status(statusCode: StatusCode) {
-    let status = RESPONSE_STATUS.ERROR;
-
-    if (HttpStatusCode.SUCCESSFUL_RESPONSES.has(statusCode.httpStatusCode)) {
-      status = RESPONSE_STATUS.SUCCESS;
-    } else if (HttpStatusCode.CLIENT_ERROR_RESPONSES.has(statusCode.httpStatusCode)) {
-      status = RESPONSE_STATUS.FAIL;
-    }
-
-    return status;
   }
 }

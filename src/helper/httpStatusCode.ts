@@ -11,11 +11,11 @@ export default class HttpStatusCode {
     this.description = description;
   }
 
-  public isSuccessStatusCode(): boolean {
-    return HttpStatusCode.isSuccessStatusCode(this);
+  public isSuccess(): boolean {
+    return HttpStatusCode.isSuccess(this);
   }
 
-  public static isSuccessStatusCode(httpStatusCode: HttpStatusCode): boolean {
+  public static isSuccess(httpStatusCode: HttpStatusCode): boolean {
     return httpStatusCode.code >= 200 && httpStatusCode.code <= 299;
   }
 
@@ -23,7 +23,7 @@ export default class HttpStatusCode {
     return JSON.stringify(this);
   }
 
-  // HTTP response status codes
+  // HTTP Status Codes
   public static readonly CONTINUE = new HttpStatusCode(
     100,
     'Continue',
@@ -385,7 +385,7 @@ export default class HttpStatusCode {
     'Network Authentication Required',
     'The 511 status code indicates that the client needs to authenticate to gain network access'
   );
-  // END HTTP response status codes
+  // END HTTP Status Codes
 
   // Informational Responses
   public static readonly INFORMATIONAL_RESPONSES: Set<HttpStatusCode> = new Set([
@@ -473,7 +473,7 @@ export default class HttpStatusCode {
   ]);
   // END Server error responses
 
-  // HTTP Status Codes
+  // HTTP Status Codes list
   public static readonly HTTP_STATUS_CODES: Set<HttpStatusCode> = new Set([
     ...HttpStatusCode.INFORMATIONAL_RESPONSES,
     ...HttpStatusCode.SUCCESSFUL_RESPONSES,
@@ -481,5 +481,5 @@ export default class HttpStatusCode {
     ...HttpStatusCode.CLIENT_ERROR_RESPONSES,
     ...HttpStatusCode.SERVER_ERROR_RESPONSES,
   ]);
-  // END HTPP Status Codes
+  // END HTPP Status Codes list
 }

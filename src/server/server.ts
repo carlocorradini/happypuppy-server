@@ -10,7 +10,7 @@ import cors from 'cors';
 import logger from '@app/logger';
 import routes from '@app/routes';
 
-class Server {
+export default class Server {
   public static readonly DEFAULT_PORT = 0;
 
   private static instance: Server;
@@ -69,5 +69,3 @@ class Server {
     return this.addressInfo;
   }
 }
-
-export default Server;

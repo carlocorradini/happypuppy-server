@@ -1,32 +1,58 @@
-import dotenv from 'dotenv';
+import envalid, { str, port, bool, num, url } from 'envalid';
+import logger from '@app/logger';
+// eslint-disable-next-line no-unused-vars
+import { Configuration } from './interfaces';
 
-export interface Config {
-  NODE_ENV: string;
-  PORT: number;
-  DATABASE_TYPE: string;
-  DATABASE_URL: string;
-  DATABASE_SSL: boolean;
-  DATABASE_SYNCHRONIZE: boolean;
-  DATABASE_ENTITIES: string;
-  DATABASE_MIGRATIONS: string;
-  DATABASE_SUBSCRIBERS: string;
-  SECURITY_JWT_KEY: string;
-}
-// Load .env file in the current working directory
-dotenv.config();
+const cleanConfig = envalid.cleanEnv(
+  process.env,
+  {
+    NODE_ENV: str({ default: 'production', choices: ['production', 'development'] }),
+    PORT: port({ devDefault: 8080 }),
+    DATABASE_URL: url(),
+    DATABASE_SSL: bool({ default: true, devDefault: false }),
+    DATABASE_SYNCHRONIZE: bool({ default: false, devDefault: true }),
+    SECURITY_BCRYPT_SALT_ROUNDS: num({
+      default: 12,
+      choices: [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32],
+    }),
+    SECURITY_JWT_SECRET: str(),
+    SECURITY_JWT_EXPIRES_IN: str({
+      default: '32d',
+      choices: ['1d', '2d', '4d', '8d', '16d', '32d'],
+    }),
+  },
+  {
+    strict: true,
+  }
+);
 
-// prettier-ignore
-const config: Config = {
-  NODE_ENV: process.env.NODE_ENV || 'production',
-  PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 80,
-  DATABASE_TYPE: process.env.DATABASE_TYPE || 'postgres',
-  DATABASE_URL: process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5432/happypuppy',
-  DATABASE_SSL: process.env.DATABASE_SSL ? process.env.DATABASE_SSL === 'true' : true,
-  DATABASE_SYNCHRONIZE: process.env.DATABASE_SYNCHRONIZE ? process.env.DATABASE_SYNCHRONIZE === 'true' : process.env.NODE_ENV === 'development',
-  DATABASE_ENTITIES: `./db/entity/**/*.${process.env.NODE_ENV === 'production' ? 'js' : 'ts'}`,
-  DATABASE_MIGRATIONS:`./db/migration/**/*.${process.env.NODE_ENV === 'production' ? 'js' : 'ts'}`,
-  DATABASE_SUBSCRIBERS: `/./db/subscriber/**/*.${process.env.NODE_ENV === 'production' ? 'js' : 'ts'}`,
-  SECURITY_JWT_KEY: process.env.SECURITY_JWT_KEY || `2:<W_+3TJ-6ahMtv7LfgXc"XKxW4"Q&`,
+logger.info('Env loaded');
+
+const config: Configuration = {
+  NODE: {
+    ENV: cleanConfig.NODE_ENV,
+    PORT: cleanConfig.PORT,
+  },
+  DATABASE: {
+    TYPE: 'postgres',
+    URL: cleanConfig.DATABASE_URL,
+    SSL: cleanConfig.DATABASE_SSL,
+    SYNCHRONIZE: cleanConfig.DATABASE_SYNCHRONIZE,
+    ENTITIES: `./db/entity/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
+    MIGRATIONS: `./db/migration/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
+    SUBSCRIBERS: `/./db/subscriber/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
+  },
+  SECURITY: {
+    BCRYPT: {
+      SALT_ROUNS: cleanConfig.SECURITY_BCRYPT_SALT_ROUNDS,
+    },
+    JWT: {
+      SECRET: cleanConfig.SECURITY_JWT_SECRET,
+      EXPIRES_IN: cleanConfig.SECURITY_JWT_EXPIRES_IN,
+    },
+  },
 };
+
+logger.debug('Configuration object constructed');
 
 export default config;

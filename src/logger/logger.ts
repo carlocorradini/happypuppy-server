@@ -40,6 +40,6 @@ const logger = createLogger({
   ],
 });
 
-logger.debug(`Logger initialized at ${logger.level} level`);
+logger.info(`Logger initialized at ${logger.level} level`);
 
 export default logger;
