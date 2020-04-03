@@ -9,7 +9,9 @@ import {
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
-import { IsString, MinLength, MaxLength, IsEmail } from 'class-validator';
+import { IsString, MinLength, MaxLength, IsEmail, IsEnum } from 'class-validator';
+// eslint-disable-next-line no-unused-vars
+import { userModel } from '@app/models';
 import { CryptUtil } from '@app/utils';
 
 @Entity('user')
@@ -17,6 +19,15 @@ export default class User {
   @PrimaryGeneratedColumn('uuid')
   @Index()
   id!: string;
+
+  @Column({
+    name: 'role',
+    type: 'enum',
+    enum: userModel.Role,
+    default: userModel.Role.STANDARD,
+  })
+  @IsEnum(userModel.Role)
+  role!: userModel.Role;
 
   @Column({ name: 'name', length: 64 })
   @IsString()
@@ -36,7 +47,7 @@ export default class User {
   @MaxLength(128)
   username!: string;
 
-  @Column({ name: 'email', length: 128, unique: true, update: false })
+  @Column({ name: 'email', length: 128, unique: true, select: false, update: false })
   @IsEmail()
   @MaxLength(128)
   email!: string;
