@@ -81,11 +81,25 @@ export default class StatusCode {
     HttpStatusCode.UNAUTHORIZED
   );
 
+  public static readonly FOUND = new StatusCode(
+    10,
+    'Found',
+    'The requested resource has been found',
+    HttpStatusCode.OK
+  );
+
   public static readonly NOT_FOUND = new StatusCode(
     404,
     'Not Found',
     'The server can not find requested resource',
     HttpStatusCode.NOT_FOUND
+  );
+
+  public static readonly UNPROCESSABLE_ENTITY = new StatusCode(
+    422,
+    'Unprocessable Entity',
+    'The request was well-formed but was unable to be followed due to semantic errors',
+    HttpStatusCode.UNPROCESSABLE_ENTITY
   );
 
   public static readonly INTERNAL_SERVER_ERROR = new StatusCode(
@@ -102,6 +116,7 @@ export default class StatusCode {
     StatusCode.AUTHENTICATION_FAILED_CREDENTIALS,
     StatusCode.AUTHENTICATION_FAILED_JWT,
     StatusCode.NOT_FOUND,
+    StatusCode.UNPROCESSABLE_ENTITY,
     StatusCode.INTERNAL_SERVER_ERROR,
   ]);
   // END Status Codes list

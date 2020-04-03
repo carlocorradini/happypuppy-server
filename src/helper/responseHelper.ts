@@ -17,7 +17,7 @@ export interface Response {
 }
 
 export default class ResponseHelper {
-  public static send(res: ExpressResponse, statusCode: StatusCode, data?: any): void {
+  public static send(res: ExpressResponse, statusCode: StatusCode, data: any = undefined): void {
     res.status(statusCode.httpStatusCode.code).json(<Response>{
       status: statusCode.status(),
       is_success: statusCode.isSuccess(),

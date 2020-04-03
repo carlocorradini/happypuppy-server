@@ -1,2 +1,3 @@
 export { default as NotFoundMiddleware } from './NotFoundMiddleware';
 export { default as ErrorMiddleware } from './ErrorMiddleware';
+export { default as ValidatorMiddleware } from './ValidatorMiddleware';

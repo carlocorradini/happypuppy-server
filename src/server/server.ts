@@ -8,7 +8,7 @@ import favicon from 'serve-favicon';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import logger from '@app/logger';
-import routes from '@app/routes';
+import routes from '@app/route';
 
 export default class Server {
   public static readonly DEFAULT_PORT = 0;
@@ -53,13 +53,9 @@ export default class Server {
       const serverListener = this.server
         .listen(port, () => {
           this.addressInfo = serverListener.address() as AddressInfo;
-          logger.debug(
-            `Server listening at ${this.addressInfo.address} on port ${this.addressInfo.port}`
-          );
           resolve(this.addressInfo);
         })
         .on('error', (ex) => {
-          logger.error(`Server listening error due to ${ex.message}`);
           reject(ex);
         });
     });

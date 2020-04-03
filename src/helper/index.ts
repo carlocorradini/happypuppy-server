@@ -3,4 +3,3 @@ export { default as StatusCode } from './statusCode';
 export * from './statusCode';
 export { default as ResponseHelper } from './responseHelper';
 export * from './responseHelper';
-export { default as ValidationHelper } from './validatorHelper';
