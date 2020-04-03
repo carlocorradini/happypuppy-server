@@ -21,10 +21,8 @@ const logger = createLogger({
         })(),
         format.colorize(),
         format.printf(
-          // eslint-disable-next-line prettier/prettier
           (info) =>
             `${info.timestamp} ${info.level} [${info.label}]: ${info.message
-              .toString()
               .replace(/\s+/g, ' ')
               .trim()}`
         )
@@ -40,11 +38,10 @@ const logger = createLogger({
       maxFiles: '16d',
       format: format.combine(
         format.printf(
-          // eslint-disable-next-line prettier/prettier
           (info) =>
-            `${info.timestamp} ${info.level.toUpperCase()} [${
-              info.label
-            }]: ${info.message.toString().replace(/\s+/g, ' ').trim()}`
+            `${info.timestamp} ${info.level.toUpperCase()} [${info.label}]: ${info.message
+              .replace(/\s+/g, ' ')
+              .trim()}`
         )
       ),
     }),
