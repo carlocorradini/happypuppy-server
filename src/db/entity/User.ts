@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { IsString, MinLength, MaxLength, IsEmail, IsEnum } from 'class-validator';
 // eslint-disable-next-line no-unused-vars
-import { userModel } from '@app/models';
+import { user } from '@app/typings';
 import { CryptUtil } from '@app/utils';
 
 @Entity('user')
@@ -23,11 +23,11 @@ export default class User {
   @Column({
     name: 'role',
     type: 'enum',
-    enum: userModel.Role,
-    default: userModel.Role.STANDARD,
+    enum: user.Role,
+    default: user.Role.STANDARD,
   })
-  @IsEnum(userModel.Role)
-  role!: userModel.Role;
+  @IsEnum(user.Role)
+  role!: user.Role;
 
   @Column({ name: 'name', length: 64 })
   @IsString()

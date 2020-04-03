@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import logger from '@app/logger';
-import { User } from '@app/db/entity';
+import User from '@app/db/entity/User';
 import { CryptUtil, JWTUtil } from '@app/utils';
 import { ResponseHelper, StatusCode } from '@app/helper';
 

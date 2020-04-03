@@ -1,7 +1,7 @@
 import envalid, { str, port, bool, num, url } from 'envalid';
 import logger from '@app/logger';
 // eslint-disable-next-line no-unused-vars
-import { configModel } from '@app/models';
+import { config as _config } from '@app/typings';
 
 const cleanConfig = envalid.cleanEnv(
   process.env,
@@ -28,7 +28,7 @@ const cleanConfig = envalid.cleanEnv(
 
 logger.info('Env loaded');
 
-const config: configModel.Configuration = {
+const config: _config.Configuration = {
   NODE: {
     ENV: cleanConfig.NODE_ENV,
     PORT: cleanConfig.PORT,

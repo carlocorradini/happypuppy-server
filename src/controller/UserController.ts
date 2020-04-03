@@ -2,12 +2,12 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import logger from '@app/logger';
-import { User } from '@app/db/entity';
+import User from '@app/db/entity/User';
 import { ResponseHelper, StatusCode } from '@app/helper';
 
 export default class UserController {
   public static findById(req: Request, res: Response): void {
-    logger.error(JSON.stringify(req.user));
+    logger.error(JSON.stringify(req?.user));
     const { id } = req.params;
 
     getRepository(User)
