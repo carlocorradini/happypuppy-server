@@ -1,5 +1,5 @@
 {
-  "name": "happy_puppy_server",
+  "name": "happy_puppy",
   "version": "1.0.0",
   "description": "Happy Puppy Server",
   "homepage": "https://github.com/carlocorradini/HappyPuppyServer",
@@ -22,9 +22,9 @@
     "test": "exit 0",
     "test:staged": "exit 0",
     "prestart": "npm install --only=prod",
-    "start": "npx cross-env NODE_ENV=\"production\" node app.js",
+    "start": "npx pm2 start ecosystem.config.js",
     "prestart:prod": "cd build && npm install --only=prod",
-    "start:prod": "cd build && npx cross-env NODE_ENV=\"production\" node app.js",
+    "start:prod": "cd build && npx pm2 start ecosystem.config.js",
     "start:dev": "npx ts-node-dev -r tsconfig-paths/register --watch src/ --ignore-watch node_modules/ --respawn --transpileOnly src/app.ts"
   },
   "author": "Carlo Corradini",
@@ -50,6 +50,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.0.0",
+    "pm2": "^4.2.3",
     "reflect-metadata": "^0.1.13",
     "serve-favicon": "^2.5.0",
     "typeorm": "^0.2.24",
