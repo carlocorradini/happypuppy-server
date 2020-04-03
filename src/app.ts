@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import path from 'path';
 // eslint-disable-next-line no-unused-vars
 import { createConnection, ConnectionOptions } from 'typeorm';
+import config from '@app/config'; // Always First!
 import logger from '@app/logger';
-import config from '@app/config';
 import Server from '@app/server';
 
 createConnection(<ConnectionOptions>{
@@ -25,6 +25,6 @@ createConnection(<ConnectionOptions>{
     logger.info(`Server running at ${addressInfo.address} on port ${addressInfo.port}`);
   })
   .catch((ex) => {
-    logger.error(ex.toString());
+    logger.error(ex.message);
     process.exit(1);
   });

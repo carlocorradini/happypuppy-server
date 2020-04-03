@@ -20,7 +20,14 @@ const logger = createLogger({
           return info;
         })(),
         format.colorize(),
-        format.printf((info) => `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`)
+        format.printf(
+          // eslint-disable-next-line prettier/prettier
+          (info) =>
+            `${info.timestamp} ${info.level} [${info.label}]: ${info.message
+              .toString()
+              .replace(/\s+/g, ' ')
+              .trim()}`
+        )
       ),
     }),
     new DailyRotateFile({
@@ -33,7 +40,11 @@ const logger = createLogger({
       maxFiles: '16d',
       format: format.combine(
         format.printf(
-          (info) => `${info.timestamp} ${info.level.toUpperCase()} [${info.label}]: ${info.message}`
+          // eslint-disable-next-line prettier/prettier
+          (info) =>
+            `${info.timestamp} ${info.level.toUpperCase()} [${
+              info.label
+            }]: ${info.message.toString().replace(/\s+/g, ' ').trim()}`
         )
       ),
     }),

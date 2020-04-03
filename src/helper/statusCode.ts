@@ -64,7 +64,7 @@ export default class StatusCode {
     0,
     'Authentication Succeeded',
     'Credentials provided has been accepted',
-    HttpStatusCode.ACCEPTED
+    HttpStatusCode.OK
   );
 
   public static readonly AUTHENTICATION_FAILED_CREDENTIALS = new StatusCode(
