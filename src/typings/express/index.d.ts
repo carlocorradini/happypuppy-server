@@ -4,7 +4,7 @@ import { types } from '@app/common';
 declare global {
   namespace Express {
     export interface Request {
-      user?: types.JWTPayload;
+      user?: types.JWT.Payload;
     }
   }
 }

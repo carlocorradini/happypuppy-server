@@ -1,4 +1,4 @@
-import HttpStatusCode from './httpStatusCode';
+import HttpStatusCode from './HttpStatusCode';
 
 export enum Status {
   // eslint-disable-next-line no-unused-vars

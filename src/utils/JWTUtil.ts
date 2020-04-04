@@ -5,7 +5,7 @@ import config from '@app/config';
 import { types } from '@app/common';
 
 export default class JWTUtil {
-  public static sign(payload: types.JWTPayload): Promise<string> {
+  public static sign(payload: types.JWT.Payload): Promise<string> {
     return Promise.resolve(
       jwt.sign(payload, config.SECURITY.JWT.SECRET, {
         expiresIn: config.SECURITY.JWT.EXPIRES_IN,

@@ -1,4 +1,6 @@
-export interface JWTPayload {
-  id: string;
-  username: string;
+export namespace JWT {
+  export interface Payload {
+    id: string;
+    username: string;
+  }
 }
