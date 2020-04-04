@@ -1,6 +1,13 @@
-// eslint-disable-next-line no-unused-vars
-import { response } from '@app/typings';
 import HttpStatusCode from './httpStatusCode';
+
+export enum Status {
+  // eslint-disable-next-line no-unused-vars
+  SUCCESS = 'success',
+  // eslint-disable-next-line no-unused-vars
+  FAIL = 'fail',
+  // eslint-disable-next-line no-unused-vars
+  ERROR = 'error',
+}
 
 export default class StatusCode {
   public readonly code: number;
@@ -31,17 +38,17 @@ export default class StatusCode {
     return statusCode.httpStatusCode.isSuccess();
   }
 
-  public status(): response.Status {
+  public status(): Status {
     return StatusCode.status(this);
   }
 
-  public static status(statusCode: StatusCode): response.Status {
-    let status = response.Status.ERROR;
+  public static status(statusCode: StatusCode): Status {
+    let status = Status.ERROR;
 
     if (HttpStatusCode.SUCCESSFUL_RESPONSES.has(statusCode.httpStatusCode)) {
-      status = response.Status.SUCCESS;
+      status = Status.SUCCESS;
     } else if (HttpStatusCode.CLIENT_ERROR_RESPONSES.has(statusCode.httpStatusCode)) {
-      status = response.Status.FAIL;
+      status = Status.FAIL;
     }
 
     return status;

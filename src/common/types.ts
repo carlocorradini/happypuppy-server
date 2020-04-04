@@ -1,4 +1,4 @@
-export interface Payload {
+export interface JWTPayload {
   id: string;
   username: string;
 }

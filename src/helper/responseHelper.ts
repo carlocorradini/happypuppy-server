@@ -1,12 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Response as ExpressResponse } from 'express';
 // eslint-disable-next-line no-unused-vars
-import { response } from '@app/typings';
-// eslint-disable-next-line no-unused-vars
-import StatusCode from './statusCode';
+import StatusCode, { Status } from './statusCode';
 
 export interface Response {
-  status: response.Status;
+  status: Status;
   // eslint-disable-next-line camelcase
   is_success: boolean;
   // eslint-disable-next-line camelcase

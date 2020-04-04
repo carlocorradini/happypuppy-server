@@ -4,8 +4,7 @@
         "files": [
             "LICENSE",
             "package.json",
-            "package-lock.json",
-            "ecosystem.config.js"
+            "package-lock.json"
         ],
         "folders": [
             "./src/public"

@@ -10,9 +10,14 @@ import {
   BeforeUpdate,
 } from 'typeorm';
 import { IsString, MinLength, MaxLength, IsEmail, IsEnum } from 'class-validator';
-// eslint-disable-next-line no-unused-vars
-import { user } from '@app/typings';
 import { CryptUtil } from '@app/utils';
+
+export enum UserRole {
+  // eslint-disable-next-line no-unused-vars
+  ADMIN = 'admin',
+  // eslint-disable-next-line no-unused-vars
+  STANDARD = 'standard',
+}
 
 @Entity('user')
 export default class User {
@@ -23,11 +28,11 @@ export default class User {
   @Column({
     name: 'role',
     type: 'enum',
-    enum: user.Role,
-    default: user.Role.STANDARD,
+    enum: UserRole,
+    default: UserRole.STANDARD,
   })
-  @IsEnum(user.Role)
-  role!: user.Role;
+  @IsEnum(UserRole)
+  role!: UserRole;
 
   @Column({ name: 'name', length: 64 })
   @IsString()
