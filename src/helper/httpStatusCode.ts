@@ -1,3 +1,12 @@
+export enum Status {
+  // eslint-disable-next-line no-unused-vars
+  SUCCESS = 'success',
+  // eslint-disable-next-line no-unused-vars
+  FAIL = 'fail',
+  // eslint-disable-next-line no-unused-vars
+  ERROR = 'error',
+}
+
 export default class HttpStatusCode {
   public readonly code: number;
 
@@ -17,6 +26,22 @@ export default class HttpStatusCode {
 
   public static isSuccess(httpStatusCode: HttpStatusCode): boolean {
     return httpStatusCode.code >= 200 && httpStatusCode.code <= 299;
+  }
+
+  public status(): Status {
+    return HttpStatusCode.status(this);
+  }
+
+  public static status(httpStatusCode: HttpStatusCode): Status {
+    let status = Status.ERROR;
+
+    if (HttpStatusCode.SUCCESSFUL_RESPONSES.has(httpStatusCode)) {
+      status = Status.SUCCESS;
+    } else if (HttpStatusCode.CLIENT_ERROR_RESPONSES.has(httpStatusCode)) {
+      status = Status.FAIL;
+    }
+
+    return status;
   }
 
   public toString(): string {

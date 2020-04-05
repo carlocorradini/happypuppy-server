@@ -1,2 +1,2 @@
 // eslint-disable-next-line import/prefer-default-export
-export { default as CryptError } from './cryptError';
+export { default as CryptError } from './CryptError';

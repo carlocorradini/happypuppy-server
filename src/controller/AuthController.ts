@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 import { CryptUtil, JWTUtil } from '@app/utils';
-import { ResponseHelper, StatusCode } from '@app/helper';
+import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class AuthController {
   public static signIn(req: Request, res: Response): void {
@@ -17,7 +17,7 @@ export default class AuthController {
         return CryptUtil.compareOrFail(req.body.password, user.password);
       })
       .then(async () => {
-        ResponseHelper.send(res, StatusCode.AUTHENTICATION_SUCCEEDED, {
+        ResponseHelper.send(res, HttpStatusCode.OK, {
           token: await JWTUtil.sign({
             id: user.id,
             username: user.username,
@@ -26,7 +26,7 @@ export default class AuthController {
       })
       .catch((ex) => {
         logger.warn(`Authentication with credentials failed due to ${ex.message}`);
-        ResponseHelper.send(res, StatusCode.AUTHENTICATION_FAILED_CREDENTIALS);
+        ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
       });
   }
 }

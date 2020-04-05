@@ -1,2 +1,2 @@
 export { default } from './logger';
-export { default as logger } from './logger';
+export * as logger from './logger';
