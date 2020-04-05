@@ -7,25 +7,24 @@ import DuplicateError, { Duplicate } from './error/DuplicateError';
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
   public saveUniqueOrFail(user: User): Promise<User> {
-    return this.repository
-      .find({
+    return this.manager.transaction(async (entityManager) => {
+      const fields = new Set<Duplicate>();
+      const users = await entityManager.find(User, {
         where: [{ username: user.username }, { email: user.email }],
         select: ['username', 'email'],
-      })
-      .then((users) => {
-        const fields = new Set<Duplicate>();
-
-        users.forEach((_user) => {
-          if (user.username === _user.username) {
-            fields.add({ property: 'username', value: user.username });
-          }
-          if (user.email === _user.email) {
-            fields.add({ property: 'email', value: user.email });
-          }
-        });
-
-        if (fields.size !== 0) throw new DuplicateError('Duplicate User found', Array.from(fields));
-        return this.repository.save(user);
       });
+
+      users.forEach((_user) => {
+        if (user.username === _user.username) {
+          fields.add({ property: 'username', value: user.username });
+        }
+        if (user.email === _user.email) {
+          fields.add({ property: 'email', value: user.email });
+        }
+      });
+
+      if (fields.size !== 0) throw new DuplicateError('Duplicate User found', Array.from(fields));
+      return entityManager.save(User, user);
+    });
   }
 }

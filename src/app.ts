@@ -13,6 +13,7 @@ createConnection(<ConnectionOptions>{
     ssl: config.DATABASE.SSL,
   },
   synchronize: config.DATABASE.SYNCHRONIZE,
+  logging: config.DATABASE.LOGGING,
   entities: [path.join(__dirname, config.DATABASE.ENTITIES)],
   migrations: [path.join(__dirname, config.DATABASE.MIGRATIONS)],
   subscribers: [path.join(__dirname, config.DATABASE.SUBSCRIBERS)],

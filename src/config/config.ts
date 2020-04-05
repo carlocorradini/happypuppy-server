@@ -11,6 +11,7 @@ export interface Configuration {
     URL: string;
     SSL: boolean;
     SYNCHRONIZE: boolean;
+    LOGGING: boolean;
     ENTITIES: string;
     MIGRATIONS: string;
     SUBSCRIBERS: string;
@@ -34,6 +35,7 @@ const cleanConfig = envalid.cleanEnv(
     DATABASE_URL: url(),
     DATABASE_SSL: bool({ default: true, devDefault: false }),
     DATABASE_SYNCHRONIZE: bool({ default: false, devDefault: true }),
+    DATABASE_LOGGING: bool({ default: false }),
     SECURITY_BCRYPT_SALT_ROUNDS: num({
       default: 12,
       choices: [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32],
@@ -61,6 +63,7 @@ const config: Configuration = {
     URL: cleanConfig.DATABASE_URL,
     SSL: cleanConfig.DATABASE_SSL,
     SYNCHRONIZE: cleanConfig.DATABASE_SYNCHRONIZE,
+    LOGGING: cleanConfig.DATABASE_LOGGING,
     ENTITIES: `./db/entity/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
     MIGRATIONS: `./db/migration/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
     SUBSCRIBERS: `/./db/subscriber/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
