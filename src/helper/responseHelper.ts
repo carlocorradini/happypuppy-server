@@ -27,9 +27,11 @@ export default class ResponseHelper {
         is_success: httpStatusCode.isSuccess(),
         status_code: httpStatusCode.code,
         status_code_name: httpStatusCode.name,
-        data: {
-          ...(httpStatusCode.isSuccess() ? data : { errors: data }),
-        },
+        ...(data !== undefined && {
+          data: {
+            ...(httpStatusCode.isSuccess() ? data : { errors: data }),
+          },
+        }),
       })
       .end();
   }
