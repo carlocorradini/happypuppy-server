@@ -16,7 +16,7 @@ export default class ValidatorMiddleware {
       const errors = validationResult(req);
 
       if (errors.isEmpty()) next();
-      else ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors);
+      else ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors.array());
     };
   }
 
@@ -36,7 +36,7 @@ export default class ValidatorMiddleware {
       });
 
       if (errors.length !== 0)
-        ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, { errors });
+        ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors);
       else if (!this.addEntityToLocals(req, entity))
         next(
           new UnknownEntityError(

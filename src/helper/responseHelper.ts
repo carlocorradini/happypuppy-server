@@ -20,12 +20,17 @@ export default class ResponseHelper {
     httpStatusCode: HttpStatusCode,
     data: any = undefined
   ): void {
-    res.status(httpStatusCode.code).json(<Response>{
-      status: httpStatusCode.status(),
-      is_success: httpStatusCode.isSuccess(),
-      status_code: httpStatusCode.code,
-      status_code_name: httpStatusCode.name,
-      data,
-    });
+    res
+      .status(httpStatusCode.code)
+      .json(<Response>{
+        status: httpStatusCode.status(),
+        is_success: httpStatusCode.isSuccess(),
+        status_code: httpStatusCode.code,
+        status_code_name: httpStatusCode.name,
+        data: {
+          ...(httpStatusCode.isSuccess() ? data : { errors: data }),
+        },
+      })
+      .end();
   }
 }

@@ -35,7 +35,7 @@ export default class UserController {
         logger.warn(`Cannot add new User due to ${ex.message}`);
 
         if (ex instanceof DuplicateError)
-          ResponseHelper.send(res, HttpStatusCode.CONFLICT, { errors: ex.errors });
+          ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
