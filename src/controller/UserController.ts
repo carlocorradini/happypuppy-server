@@ -14,7 +14,7 @@ export default class UserController {
     getRepository(User)
       .findOneOrFail({ id })
       .then((user) => {
-        ResponseHelper.send(res, HttpStatusCode.FOUND, user);
+        ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
         logger.warn(`Cannot find User with id ${id} due to ${ex.message}`);

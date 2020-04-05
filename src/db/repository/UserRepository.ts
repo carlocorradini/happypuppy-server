@@ -5,7 +5,7 @@ import User from '@app/db/entity/User';
 import DuplicateError, { Duplicate } from './error/DuplicateError';
 
 @EntityRepository(User)
-export default class FilmRepository extends AbstractRepository<User> {
+export default class UserRepository extends AbstractRepository<User> {
   public saveUniqueOrFail(user: User): Promise<User> {
     return this.repository
       .find({
