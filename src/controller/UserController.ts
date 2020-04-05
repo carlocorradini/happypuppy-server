@@ -8,7 +8,7 @@ import { DuplicateError } from '@app/db/repository/error';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class UserController {
-  public static findById(req: Request, res: Response): void {
+  public static find(req: Request, res: Response): void {
     const { id } = req.params;
 
     getRepository(User)
@@ -17,25 +17,45 @@ export default class UserController {
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
-        logger.warn(`Cannot find User with id ${id} due to ${ex.message}`);
-        ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        logger.warn(`Failed to find User with id ${id} due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
 
   public static register(req: Request, res: Response): void {
-    const user: User = req.app.locals?.user;
+    const { user } = req.app.locals;
 
     getCustomRepository(UserRepository)
-      .saveUniqueOrFail(user)
+      .saveOrFail(user)
       .then((_user) => {
-        logger.info(`Added new User with id ${_user.id}`);
+        logger.info(`Registered User with id ${_user.id}`);
         ResponseHelper.send(res, HttpStatusCode.CREATED, { id: _user.id });
       })
       .catch((ex) => {
-        logger.warn(`Cannot add new User due to ${ex.message}`);
+        logger.warn(`Failed to register User due to ${ex.message}`);
 
         if (ex instanceof DuplicateError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static update(req: Request, res: Response): void {
+    req.app.locals.user.id = req.params.id;
+    const { user } = req.app.locals;
+
+    getCustomRepository(UserRepository)
+      .updateOrFail(user)
+      .then((_user) => {
+        logger.info(`Updated User with id ${_user.id}`);
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to update User due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }

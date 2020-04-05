@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import {
   IsString,
@@ -14,9 +15,9 @@ import {
   IsEmail,
   IsEnum,
   Length,
-  IsUUID,
   IsEmpty,
   IsNotEmpty,
+  IsOptional,
 } from 'class-validator';
 import { CryptUtil } from '@app/utils';
 
@@ -38,8 +39,7 @@ export enum UserValidationGroup {
 export default class User {
   @PrimaryGeneratedColumn('uuid', { name: 'id' })
   @Index()
-  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsUUID('4', { groups: [UserValidationGroup.UPDATE] })
+  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   id!: string;
 
   @Column({
@@ -48,19 +48,22 @@ export default class User {
     enum: UserRole,
     default: UserRole.STANDARD,
   })
-  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
   @IsEnum(UserRole, { groups: [UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
   role!: UserRole;
 
   @Column({ name: 'name', length: 64 })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   name!: string;
 
   @Column({ name: 'surname', length: 64 })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   surname!: string;
 
@@ -79,10 +82,10 @@ export default class User {
   email!: string;
 
   @Column({ name: 'password', length: 72, select: false })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @Length(8, 64, { groups: [UserValidationGroup.REGISTRATION] }) // Clear password
+  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @Length(8, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] }) // Clear password
   password!: string;
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
@@ -95,5 +98,10 @@ export default class User {
   async onRegistration() {
     this.role = UserRole.STANDARD;
     this.password = await CryptUtil.hash(this.password);
+  }
+
+  @BeforeUpdate()
+  async onUpdate() {
+    if (this.password !== undefined) this.password = await CryptUtil.hash(this.password);
   }
 }

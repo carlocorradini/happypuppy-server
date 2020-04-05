@@ -2,11 +2,13 @@ import { AbstractRepository, EntityRepository } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
 // eslint-disable-next-line no-unused-vars
+import logger from '@app/logger';
+// eslint-disable-next-line no-unused-vars
 import DuplicateError, { Duplicate } from './error/DuplicateError';
 
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
-  public saveUniqueOrFail(user: User): Promise<User> {
+  public saveOrFail(user: User): Promise<User> {
     return this.manager.transaction(async (entityManager) => {
       const fields = new Set<Duplicate>();
       const users = await entityManager.find(User, {
@@ -25,6 +27,16 @@ export default class UserRepository extends AbstractRepository<User> {
 
       if (fields.size !== 0) throw new DuplicateError('Duplicate User found', Array.from(fields));
       return entityManager.save(User, user);
+    });
+  }
+
+  public updateOrFail(user: User): Promise<User> {
+    return this.manager.transaction(async (entityManager) => {
+      const userToUpdate: User = await entityManager.findOneOrFail(User, {
+        where: { id: user.id },
+      });
+      await entityManager.merge(User, userToUpdate, user);
+      return entityManager.save(User, userToUpdate);
     });
   }
 }

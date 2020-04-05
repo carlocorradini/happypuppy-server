@@ -17,7 +17,7 @@ router.get(
       },
     })
   ),
-  UserController.findById
+  UserController.find
 );
 
 router.post(
@@ -26,9 +26,22 @@ router.post(
   UserController.register
 );
 
+router.patch(
+  '/:id',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid User id',
+      },
+    })
+  ),
+  ValidatorMiddleware.validateEntity(User, [UserValidationGroup.UPDATE]),
+  UserController.update
+);
+
 /* router.get('', UserController.getAll);
-router.post('', ValidatorMiddleware.validate([body('username').isString()]), UserController.add);
-router.delete('/:id', UserController.delete);
-router.put('/:id', UserController.update); */
+router.delete('/:id', UserController.delete); */
 
 export default router;
