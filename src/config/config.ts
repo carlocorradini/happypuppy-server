@@ -25,6 +25,11 @@ export interface Configuration {
       EXPIRES_IN: string;
     };
   };
+  RESOURCE: {
+    IMAGE: {
+      EXT: string;
+    };
+  };
 }
 
 const cleanConfig = envalid.cleanEnv(
@@ -75,6 +80,11 @@ const config: Configuration = {
     JWT: {
       SECRET: cleanConfig.SECURITY_JWT_SECRET,
       EXPIRES_IN: cleanConfig.SECURITY_JWT_EXPIRES_IN,
+    },
+  },
+  RESOURCE: {
+    IMAGE: {
+      EXT: '.png',
     },
   },
 };

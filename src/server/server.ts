@@ -7,6 +7,8 @@ import helmet from 'helmet';
 import favicon from 'serve-favicon';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import jwt from 'express-jwt';
+import config from '@app/config';
 import logger from '@app/logger';
 import routes from '@app/route';
 import { NotFoundMiddleware, ErrorMiddleware } from '@app/middleware';
@@ -37,7 +39,14 @@ export default class Server {
       .use(bodyParser.json())
       .use(bodyParser.urlencoded({ extended: true }))
       .use(favicon(path.join(__dirname, '../public', 'favicon.ico')))
-      .use('/static', express.static(path.join(__dirname, '../public')))
+      .use('/public', express.static(path.join(__dirname, '../public')))
+      .use(
+        '/private',
+        jwt({
+          secret: config.SECURITY.JWT.SECRET,
+        }),
+        express.static(path.join(__dirname, '../private'))
+      )
       .use('/', routes)
       .use(NotFoundMiddleware.handle)
       .use(ErrorMiddleware.handle);

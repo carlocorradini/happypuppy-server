@@ -25,7 +25,7 @@
     "start": "npx cross-env NODE_ENV=\"production\" node app.js",
     "prestart:prod": "cd build && npm install --only=prod",
     "start:prod": "cd build && npx cross-env NODE_ENV=\"production\" node app.js",
-    "start:dev": "npx ts-node-dev -r tsconfig-paths/register --watch src/ --ignore-watch node_modules/ --respawn --transpileOnly src/app.ts"
+    "start:dev": "npx ts-node-dev --prefer-ts true --no-notify -r tsconfig-paths/register --watch src/ --ignore-watch node_modules/ --respawn --transpileOnly src/app.ts"
   },
   "author": "Carlo Corradini",
   "contributors": [
@@ -52,6 +52,7 @@
     "pg": "^8.0.0",
     "reflect-metadata": "^0.1.13",
     "serve-favicon": "^2.5.0",
+    "twilio": "^3.42.0",
     "typeorm": "^0.2.24",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2"

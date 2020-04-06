@@ -19,7 +19,25 @@ router.get(
   ),
   UserController.find
 );
-
+/*
+router.get(
+  '/:id/avatar',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid User id',
+      },
+    })
+  )
+  UserController.avatar
+);
+router.get(
+  '/avatar',
+  UserController.avatar
+)
+*/
 router.post(
   '',
   ValidatorMiddleware.validateEntity(User, [UserValidationGroup.REGISTRATION]),
