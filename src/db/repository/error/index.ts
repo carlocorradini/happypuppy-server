@@ -1,2 +1,2 @@
-// eslint-disable-next-line import/prefer-default-export
 export { default as DuplicateEntityError } from './DuplicateEntityError';
+export { default as UserNotVerifiedError } from './UserNotVerifiedError';

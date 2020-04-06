@@ -12,7 +12,7 @@ export default class UserController {
     const { id } = req.params;
 
     getRepository(User)
-      .findOneOrFail({ id })
+      .findOneOrFail({ id, verified: true })
       .then((user) => {
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })

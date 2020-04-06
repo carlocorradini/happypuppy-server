@@ -1,8 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
+// eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
+import UserRepository from '@app/db/repository/UserRepository';
+import { UserNotVerifiedError } from '@app/db/repository/error';
 import { CryptUtil, JWTUtil } from '@app/utils';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
@@ -10,8 +13,11 @@ export default class AuthController {
   public static signIn(req: Request, res: Response): void {
     let user: User;
 
-    getRepository(User)
-      .findOneOrFail({ username: req.body.username }, { select: ['id', 'username', 'password'] })
+    getCustomRepository(UserRepository)
+      .findOneAndVerifiedOrFail(
+        { username: req.body.username },
+        { select: ['id', 'username', 'password'] }
+      )
       .then((_user) => {
         user = _user;
         return CryptUtil.compareOrFail(req.body.password, user.password);
@@ -26,7 +32,9 @@ export default class AuthController {
       })
       .catch((ex) => {
         logger.warn(`Authentication with credentials failed due to ${ex.message}`);
-        ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
+
+        if (ex instanceof UserNotVerifiedError) ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
+        else ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
       });
   }
 }

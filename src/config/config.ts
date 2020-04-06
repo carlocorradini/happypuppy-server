@@ -27,7 +27,14 @@ export interface Configuration {
   };
   RESOURCE: {
     IMAGE: {
-      EXT: string;
+      USER: {
+        CONTEXT_PATH: string;
+        EXT: string;
+      };
+      PUPPY: {
+        CONTEXT_PATH: string;
+        EXT: string;
+      };
     };
   };
 }
@@ -84,7 +91,14 @@ const config: Configuration = {
   },
   RESOURCE: {
     IMAGE: {
-      EXT: '.png',
+      USER: {
+        CONTEXT_PATH: '/private/image/user/',
+        EXT: '.png',
+      },
+      PUPPY: {
+        CONTEXT_PATH: '/private/image/puppy/',
+        EXT: '.png',
+      },
     },
   },
 };

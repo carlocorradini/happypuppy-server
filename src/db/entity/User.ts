@@ -61,7 +61,12 @@ export default class User {
   @IsEnum(UserRole, { groups: [UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.UPDATE] })
   @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsNotEmpty({ groups: [UserValidationGroup.UPDATE] })
   role!: UserRole;
+
+  @Column({ name: 'verified', default: false, select: false })
+  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  verified!: boolean;
 
   @Column({ name: 'name', length: 64 })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
@@ -106,10 +111,13 @@ export default class User {
 
   //! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   @Column({ name: 'avatar', length: 128 })
-  @IsString()
-  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @Length(1, 128)
+  @IsString({ groups: [UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsNotEmpty({ groups: [UserValidationGroup.UPDATE] })
+  @Length(1, 128, { groups: [UserValidationGroup.UPDATE] })
   avatar!: string;
+  // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // eslint-disable-next-line no-unused-vars
   @OneToMany((_type) => Puppy, (puppy) => puppy.user)
@@ -144,6 +152,7 @@ export default class User {
       }
     }
 
-    this.avatar += config.RESOURCE.IMAGE.EXT;
+    this.avatar =
+      config.RESOURCE.IMAGE.USER.CONTEXT_PATH + this.avatar + config.RESOURCE.IMAGE.USER.EXT;
   }
 }
