@@ -1,13 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Response, Request, NextFunction } from 'express';
 // eslint-disable-next-line no-unused-vars
-import { ObjectType, getRepository, DeepPartial } from 'typeorm';
-// eslint-disable-next-line no-unused-vars
 import { ValidationChain, validationResult } from 'express-validator';
-import { validate as validateClass } from 'class-validator';
-import User from '@app/db/entity/User';
+// eslint-disable-next-line no-unused-vars
+import { transformAndValidate, ClassType } from 'class-transformer-validator';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
-import { UnknownEntityError } from './error';
 
 export default class ValidatorMiddleware {
   public static validateChain(validations: ValidationChain[]) {
@@ -20,44 +17,35 @@ export default class ValidatorMiddleware {
     };
   }
 
-  public static validateEntity<Entity>(
-    entityClass: ObjectType<Entity>,
+  public static validateClass<T extends object>(
+    classType: ClassType<T>,
     validationGroup?: string[]
   ) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const entity = getRepository(entityClass).create(req.body);
-      const errors = await validateClass(entity, {
-        groups: validationGroup,
-        forbidUnknownValues: true,
-        validationError: {
-          target: false,
-          value: true,
+      transformAndValidate(classType, req.body, {
+        validator: {
+          groups: validationGroup,
+          forbidUnknownValues: true,
+          validationError: {
+            target: false,
+            value: true,
+          },
         },
-      });
-
-      if (errors.length !== 0)
-        ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors);
-      else if (!this.addEntityToLocals(req, entity))
-        next(
-          new UnknownEntityError(
-            `Failed to validate entity that is unknown, ${entityClass.name} not found`
-          )
-        );
-      else {
-        next();
-      }
+      })
+        .then((_class) => {
+          return this.addClassToLocals(req, _class);
+        })
+        .then(() => {
+          next();
+        })
+        .catch((ex) => {
+          ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, ex);
+        });
     };
   }
 
-  private static addEntityToLocals<Entity>(req: Request, entity: DeepPartial<Entity>): boolean {
-    let added: boolean = true;
-
-    if (entity instanceof User) {
-      req.app.locals.user = entity;
-    } else {
-      added = false;
-    }
-
-    return added;
+  private static addClassToLocals<T extends object>(req: Request, _class: T): Promise<void> {
+    req.app.locals[_class.constructor.name] = _class;
+    return Promise.resolve();
   }
 }

@@ -84,7 +84,7 @@ export default class UserRepository extends AbstractRepository<User> {
     });
   }
 
-  // todo Validazione duplicati dato che per ora puoi aggiornare solo valori non unique
+  // TODO Validazione duplicati dato che per ora puoi aggiornare solo valori non unique
   public updateOrFail(user: User): Promise<User> {
     return this.manager.transaction(async (entityManager) => {
       const userToUpdate: User = await entityManager.findOneOrFail(User, {

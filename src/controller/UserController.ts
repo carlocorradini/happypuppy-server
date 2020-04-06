@@ -26,7 +26,7 @@ export default class UserController {
   }
 
   public static register(req: Request, res: Response): void {
-    const { user } = req.app.locals;
+    const user: User = req.app.locals.User;
 
     getCustomRepository(UserRepository)
       .saveOrFail(user)
@@ -44,8 +44,8 @@ export default class UserController {
   }
 
   public static update(req: Request, res: Response): void {
-    const { user } = req.app.locals;
-    user.id = req.user?.id;
+    const user: User = req.app.locals.User;
+    user.id = req.user?.id ? req.user.id : '';
 
     getCustomRepository(UserRepository)
       .updateOrFail(user)
@@ -62,7 +62,7 @@ export default class UserController {
   }
 
   public static delete(req: Request, res: Response): void {
-    const id = req.user?.id;
+    const id: string = req.user?.id ? req.user.id : '';
 
     getCustomRepository(UserRepository)
       .deleteOrFail(getRepository(User).create({ id }))

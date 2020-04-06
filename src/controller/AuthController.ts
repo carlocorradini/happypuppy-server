@@ -39,6 +39,7 @@ export default class AuthController {
       });
   }
 
+  // TODO Aggiungere verifica codici email and phone
   public static verify(req: Request, res: Response): void {
     const { id } = req.params;
 

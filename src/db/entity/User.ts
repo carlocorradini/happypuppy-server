@@ -124,6 +124,7 @@ export default class User {
   @Length(1, 128, { groups: [UserValidationGroup.UPDATE] })
   avatar!: string;
 
+  // TODO type?
   // eslint-disable-next-line no-unused-vars
   @OneToMany((_type) => Puppy, (puppy) => puppy.user)
   puppies!: Promise<Puppy[]>;
