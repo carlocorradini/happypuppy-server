@@ -95,13 +95,8 @@ export default class User {
   updated_at!: Date;
 
   @BeforeInsert()
-  async onRegistration() {
-    this.role = UserRole.STANDARD;
-    this.password = await CryptUtil.hash(this.password);
-  }
-
   @BeforeUpdate()
-  async onUpdate() {
+  async hashPassword() {
     if (this.password !== undefined) this.password = await CryptUtil.hash(this.password);
   }
 }

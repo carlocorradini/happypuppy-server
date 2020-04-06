@@ -20,7 +20,7 @@ export default class AuthController {
         ResponseHelper.send(res, HttpStatusCode.OK, {
           token: await JWTUtil.sign({
             id: user.id,
-            username: user.username,
+            role: user.role,
           }),
         });
       })
