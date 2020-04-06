@@ -12,13 +12,13 @@ import {
 } from 'typeorm';
 import {
   IsString,
-  MaxLength,
   IsEmail,
   IsEnum,
   Length,
   IsEmpty,
   IsNotEmpty,
   IsOptional,
+  IsMobilePhone,
 } from 'class-validator';
 import config from '@app/config';
 import { CryptUtil } from '@app/utils';
@@ -99,8 +99,15 @@ export default class User {
   @IsEmail(undefined, { groups: [UserValidationGroup.REGISTRATION] })
   @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @MaxLength(128, { groups: [UserValidationGroup.REGISTRATION] })
+  @Length(3, 128, { groups: [UserValidationGroup.REGISTRATION] })
   email!: string;
+
+  @Column({ name: 'phone', length: 15, unique: true, select: false, update: false })
+  @IsMobilePhone('any', { groups: [UserValidationGroup.REGISTRATION] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
+  @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION] })
+  phone!: string;
 
   @Column({ name: 'password', length: 72, select: false })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
@@ -109,7 +116,6 @@ export default class User {
   @Length(8, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] }) // Clear password
   password!: string;
 
-  //! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   @Column({ name: 'avatar', length: 128 })
   @IsString({ groups: [UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.UPDATE] })
@@ -117,7 +123,6 @@ export default class User {
   @IsNotEmpty({ groups: [UserValidationGroup.UPDATE] })
   @Length(1, 128, { groups: [UserValidationGroup.UPDATE] })
   avatar!: string;
-  // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // eslint-disable-next-line no-unused-vars
   @OneToMany((_type) => Puppy, (puppy) => puppy.user)
