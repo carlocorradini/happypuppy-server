@@ -4,22 +4,23 @@ import { getRepository, getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 import UserRepository from '@app/db/repository/UserRepository';
-import { DuplicateEntityError } from '@app/db/repository/error';
+import { DuplicateEntityError, UserNotVerifiedError } from '@app/db/repository/error';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class UserController {
   public static find(req: Request, res: Response): void {
     const { id } = req.params;
 
-    getRepository(User)
-      .findOneOrFail({ id, verified: true })
+    getCustomRepository(UserRepository)
+      .findOneAndVerifiedOrFail(id)
       .then((user) => {
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
         logger.warn(`Failed to find User with id ${id} due to ${ex.message}`);
 
-        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        if (ex.name === 'EntityNotFound' || ex instanceof UserNotVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
