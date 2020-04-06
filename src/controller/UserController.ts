@@ -4,7 +4,7 @@ import { getRepository, getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 import UserRepository from '@app/db/repository/UserRepository';
-import { DuplicateError } from '@app/db/repository/error';
+import { DuplicateEntityError } from '@app/db/repository/error';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class UserController {
@@ -36,7 +36,7 @@ export default class UserController {
       .catch((ex) => {
         logger.warn(`Failed to register User due to ${ex.message}`);
 
-        if (ex instanceof DuplicateError)
+        if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });

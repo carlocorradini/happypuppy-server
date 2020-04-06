@@ -2,7 +2,7 @@ import { AbstractRepository, EntityRepository } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
 // eslint-disable-next-line no-unused-vars
-import DuplicateError, { Duplicate } from './error/DuplicateError';
+import DuplicateEntityError, { Duplicate } from './error/DuplicateEntityError';
 
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
@@ -23,7 +23,8 @@ export default class UserRepository extends AbstractRepository<User> {
         }
       });
 
-      if (fields.size !== 0) throw new DuplicateError('Duplicate User found', Array.from(fields));
+      if (fields.size !== 0)
+        throw new DuplicateEntityError('Duplicate User found', Array.from(fields));
       return entityManager.save(User, user);
     });
   }
