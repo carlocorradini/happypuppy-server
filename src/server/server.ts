@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import logger from '@app/logger';
 import routes from '@app/route';
+import { NotFoundMiddleware, ErrorMiddleware } from '@app/middleware';
 
 export default class Server {
   public static readonly DEFAULT_PORT = 0;
@@ -37,7 +38,9 @@ export default class Server {
       .use(bodyParser.urlencoded({ extended: true }))
       .use(favicon(path.join(__dirname, '../public', 'favicon.ico')))
       .use('/static', express.static(path.join(__dirname, '../public')))
-      .use('/', routes);
+      .use('/', routes)
+      .use(NotFoundMiddleware.handle)
+      .use(ErrorMiddleware.handle);
   }
 
   public static getInstance(): Server {
