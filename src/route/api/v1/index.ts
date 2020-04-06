@@ -13,9 +13,9 @@ router.use(
     path: [
       {
         url: '/api/v1/auth/signin',
-        method: 'POST',
+        methods: ['POST'],
       },
-      { url: '/api/v1/auth/user', method: 'POST' },
+      { url: '/api/v1/auth/user', methods: ['POST'] },
     ],
   }),
   auth

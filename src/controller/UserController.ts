@@ -43,8 +43,8 @@ export default class UserController {
   }
 
   public static update(req: Request, res: Response): void {
-    req.app.locals.user.id = req.params.id;
     const { user } = req.app.locals;
+    user.id = req.user?.id;
 
     getCustomRepository(UserRepository)
       .updateOrFail(user)

@@ -2,8 +2,6 @@ import { AbstractRepository, EntityRepository } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
 // eslint-disable-next-line no-unused-vars
-import logger from '@app/logger';
-// eslint-disable-next-line no-unused-vars
 import DuplicateError, { Duplicate } from './error/DuplicateError';
 
 @EntityRepository(User)

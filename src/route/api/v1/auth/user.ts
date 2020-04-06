@@ -27,16 +27,7 @@ router.post(
 );
 
 router.patch(
-  '/:id',
-  ValidatorMiddleware.validateChain(
-    checkSchema({
-      id: {
-        in: ['params'],
-        isUUID: true,
-        errorMessage: 'Invalid User id',
-      },
-    })
-  ),
+  '',
   ValidatorMiddleware.validateEntity(User, [UserValidationGroup.UPDATE]),
   UserController.update
 );
