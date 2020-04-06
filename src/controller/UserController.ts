@@ -59,4 +59,21 @@ export default class UserController {
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
+
+  public static delete(req: Request, res: Response): void {
+    const id = req.user?.id;
+
+    getCustomRepository(UserRepository)
+      .deleteOrFail(getRepository(User).create({ id }))
+      .then(() => {
+        logger.info(`Deleted User with id ${id}`);
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to delete User due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
 }

@@ -1,4 +1,5 @@
-import { AbstractRepository, EntityRepository } from 'typeorm';
+// eslint-disable-next-line no-unused-vars
+import { AbstractRepository, EntityRepository, DeleteResult } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
 // eslint-disable-next-line no-unused-vars
@@ -36,6 +37,13 @@ export default class UserRepository extends AbstractRepository<User> {
       });
       await entityManager.merge(User, userToUpdate, user);
       return entityManager.save(User, userToUpdate);
+    });
+  }
+
+  public deleteOrFail(user: User): Promise<DeleteResult> {
+    return this.manager.transaction(async (entityManager) => {
+      await entityManager.findOneOrFail(User, user);
+      return entityManager.delete(User, user);
     });
   }
 }
