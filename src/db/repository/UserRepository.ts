@@ -99,22 +99,36 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  // TODO EntityManager
   // TODO Validazione duplicati dato che per ora puoi aggiornare solo valori non unique
-  public updateOrFail(user: User): Promise<User> {
-    return this.manager.transaction(async (entityManager) => {
-      const userToUpdate: User = await entityManager.findOneOrFail(User, {
+
+  public async updateOrFail(user: User): Promise<User>;
+
+  public async updateOrFail(user: User, entityManager: EntityManager): Promise<User>;
+
+  public async updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
+    const callback = async (em: EntityManager) => {
+      const userToUpdate: User = await em.findOneOrFail(User, {
         where: { id: user.id },
       });
-      await entityManager.merge(User, userToUpdate, user);
-      return entityManager.save(User, userToUpdate);
-    });
+      await em.merge(User, userToUpdate, user);
+      return em.save(User, userToUpdate);
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
   }
 
-  public deleteOrFail(user: User): Promise<DeleteResult> {
-    return this.manager.transaction(async (entityManager) => {
-      await entityManager.findOneOrFail(User, user);
-      return entityManager.delete(User, user);
-    });
+  public async deleteOrFail(user: User): Promise<DeleteResult>;
+
+  public async deleteOrFail(user: User, entityManager: EntityManager): Promise<DeleteResult>;
+
+  public async deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
+    const callback = async (em: EntityManager) => {
+      await em.findOneOrFail(User, user);
+      return em.delete(User, user);
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
   }
 }
