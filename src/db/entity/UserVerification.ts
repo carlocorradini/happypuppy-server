@@ -1,12 +1,10 @@
 /* eslint-disable camelcase */
-import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, RelationId, Check } from 'typeorm';
-import { IsNotEmpty, IsInt, IsPositive, IsUUID, Min, Max } from 'class-validator';
+import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, RelationId } from 'typeorm';
+import { IsNotEmpty, IsUUID, IsNumberString, Length } from 'class-validator';
 import config from '@app/config';
 import User from './User';
 
 @Entity('user_verification')
-@Check(`email_code >= 0 AND email_code <= ${10 ** config.SECURITY.VERIFICATION.EMAIL.DIGITS - 1}`)
-@Check(`phone_code >= 0 AND phone_code <= ${10 ** config.SECURITY.VERIFICATION.PHONE.DIGITS - 1}`)
 export default class UserVerification {
   // TODO type???
   // eslint-disable-next-line no-unused-vars
@@ -19,23 +17,17 @@ export default class UserVerification {
   @IsNotEmpty()
   user_id!: string;
 
-  // TODO Max Length & Min length
-  @Column({ name: 'email_code', type: 'integer' })
-  @IsInt()
-  @IsPositive()
+  @Column({ name: 'otp_email', length: config.SECURITY.OTP.EMAIL.DIGITS })
+  @IsNumberString()
   @IsNotEmpty()
-  @Min(0)
-  @Max(10 ** config.SECURITY.VERIFICATION.EMAIL.DIGITS - 1)
-  email_code!: number;
+  @Length(config.SECURITY.OTP.EMAIL.DIGITS, config.SECURITY.OTP.EMAIL.DIGITS)
+  otp_email!: string;
 
-  // TODO Max Length & Min length
-  @Column({ name: 'phone_code', type: 'integer' })
-  @IsInt()
-  @IsPositive()
+  @Column({ name: 'otp_phone', length: config.SECURITY.OTP.PHONE.DIGITS })
+  @IsNumberString()
   @IsNotEmpty()
-  @Min(0)
-  @Max(10 ** config.SECURITY.VERIFICATION.PHONE.DIGITS - 1)
-  phone_code!: number;
+  @Length(config.SECURITY.OTP.PHONE.DIGITS, config.SECURITY.OTP.PHONE.DIGITS)
+  otp_phone!: string;
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;

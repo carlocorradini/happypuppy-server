@@ -11,6 +11,8 @@ import {
   FindConditions,
   // eslint-disable-next-line no-unused-vars
   DeleteResult,
+  // eslint-disable-next-line no-unused-vars
+  EntityManager,
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
@@ -18,6 +20,7 @@ import User from '@app/db/entity/User';
 import { DuplicateEntityError, UserNotVerifiedError } from './error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from './error/DuplicateEntityError';
+import UserVerificationRepository from './UserVerificationRepository';
 
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
@@ -58,10 +61,14 @@ export default class UserRepository extends AbstractRepository<User> {
       });
   }
 
-  public saveOrFail(user: User): Promise<User> {
-    return this.manager.transaction(async (entityManager) => {
+  public async saveOrFail(user: User): Promise<User>;
+
+  public async saveOrFail(user: User, entityManager: EntityManager): Promise<User>;
+
+  public async saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
+    const callback = async (em: EntityManager) => {
       const fields = new Set<Duplicate>();
-      const users = await entityManager.find(User, {
+      const users = await em.find(User, {
         where: [{ username: user.username }, { email: user.email }, { phone: user.phone }],
         select: ['username', 'email', 'phone'],
       });
@@ -80,10 +87,19 @@ export default class UserRepository extends AbstractRepository<User> {
 
       if (fields.size !== 0)
         throw new DuplicateEntityError('Duplicate User found', Array.from(fields));
-      return entityManager.save(User, user);
-    });
+
+      const newUser: User = await em.save(User, user);
+
+      await em.getCustomRepository(UserVerificationRepository).saveOrFail(newUser, em);
+
+      return Promise.resolve(newUser);
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
   }
 
+  // TODO EntityManager
   // TODO Validazione duplicati dato che per ora puoi aggiornare solo valori non unique
   public updateOrFail(user: User): Promise<User> {
     return this.manager.transaction(async (entityManager) => {

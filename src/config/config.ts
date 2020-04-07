@@ -17,7 +17,7 @@ export interface Configuration {
     SUBSCRIBERS: string;
   };
   SECURITY: {
-    VERIFICATION: {
+    OTP: {
       EMAIL: {
         DIGITS: number;
       };
@@ -89,7 +89,7 @@ const config: Configuration = {
     SUBSCRIBERS: `/./db/subscriber/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
   },
   SECURITY: {
-    VERIFICATION: {
+    OTP: {
       EMAIL: { DIGITS: 5 },
       PHONE: { DIGITS: 5 },
     },
