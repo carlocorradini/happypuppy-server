@@ -17,6 +17,14 @@ export interface Configuration {
     SUBSCRIBERS: string;
   };
   SECURITY: {
+    VERIFICATION: {
+      EMAIL: {
+        DIGITS: number;
+      };
+      PHONE: {
+        DIGITS: number;
+      };
+    };
     BCRYPT: {
       SALT_ROUNS: number;
     };
@@ -81,6 +89,10 @@ const config: Configuration = {
     SUBSCRIBERS: `/./db/subscriber/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
   },
   SECURITY: {
+    VERIFICATION: {
+      EMAIL: { DIGITS: 5 },
+      PHONE: { DIGITS: 5 },
+    },
     BCRYPT: {
       SALT_ROUNS: cleanConfig.SECURITY_BCRYPT_SALT_ROUNDS,
     },

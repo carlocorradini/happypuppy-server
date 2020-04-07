@@ -22,13 +22,13 @@ router.get(
 
 router.post(
   '',
-  ValidatorMiddleware.validateClass(User, [UserValidationGroup.REGISTRATION]),
+  ValidatorMiddleware.validateClass(User, UserValidationGroup.REGISTRATION),
   UserController.register
 );
 
 router.patch(
   '',
-  ValidatorMiddleware.validateClass(User, [UserValidationGroup.UPDATE]),
+  ValidatorMiddleware.validateClass(User, UserValidationGroup.UPDATE),
   UserController.update
 );
 

@@ -19,12 +19,12 @@ export default class ValidatorMiddleware {
 
   public static validateClass<T extends object>(
     classType: ClassType<T>,
-    validationGroup?: string[]
+    validationGroup: string | string[] = []
   ) {
     return async (req: Request, res: Response, next: NextFunction) => {
       transformAndValidate(classType, req.body, {
         validator: {
-          groups: validationGroup,
+          groups: Array.isArray(validationGroup) ? validationGroup : [validationGroup],
           forbidUnknownValues: true,
           validationError: {
             target: false,

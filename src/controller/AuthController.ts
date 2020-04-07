@@ -1,11 +1,18 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getCustomRepository, getRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
+// eslint-disable-next-line no-unused-vars
+import UserVerification from '@app/db/entity/UserVerification';
 import UserRepository from '@app/db/repository/UserRepository';
-import { UserNotVerifiedError } from '@app/db/repository/error';
+import UserVerificationRepository from '@app/db/repository/UserVerificationRepository';
+import {
+  UserNotVerifiedError,
+  EntityNotFoundError,
+  DataMismatchError,
+} from '@app/db/repository/error';
 import { CryptUtil, JWTUtil } from '@app/utils';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
@@ -29,22 +36,23 @@ export default class AuthController {
         });
       })
       .then((token) => {
+        logger.info(`Authentication with credentials succeeded for User with id ${user.id}`);
+
         ResponseHelper.send(res, HttpStatusCode.OK, { token });
       })
       .catch((ex) => {
-        logger.warn(`Authentication with credentials failed due to ${ex.message}`);
+        logger.warn(`Failed to authenticate with credentials due to ${ex.message}`);
 
         if (ex instanceof UserNotVerifiedError) ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
       });
   }
 
-  // TODO Aggiungere verifica codici email and phone
   public static verify(req: Request, res: Response): void {
-    const { id } = req.params;
+    const userVerification: UserVerification = req.app.locals.UserVerification;
 
-    getCustomRepository(UserRepository)
-      .updateOrFail(getRepository(User).create({ id, verified: false }))
+    getCustomRepository(UserVerificationRepository)
+      .verifyOrFail(userVerification)
       .then((user) => {
         return JWTUtil.sign({
           id: user.id,
@@ -52,13 +60,18 @@ export default class AuthController {
         });
       })
       .then((token) => {
+        logger.info(`Verification succeeded for User with id ${userVerification.user_id}`);
+
         ResponseHelper.send(res, HttpStatusCode.OK, { token });
       })
       .catch((ex) => {
-        logger.warn(`Failed to verify User with id ${id} due to ${ex.message}`);
+        logger.warn(`Failed to verify User due to ${ex.message}`);
 
-        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
-        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+        if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
+          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else if (ex instanceof DataMismatchError) {
+          ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
+        } else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
 }

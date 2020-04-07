@@ -12,7 +12,7 @@ router.use(
   }).unless({
     path: [
       {
-        url: '/api/v1/auth/verify/:id',
+        url: '/api/v1/auth/verify',
         methods: ['POST'],
       },
       {

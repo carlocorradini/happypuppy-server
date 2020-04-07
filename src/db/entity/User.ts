@@ -28,6 +28,8 @@ export enum UserValidationGroup {
   // eslint-disable-next-line no-unused-vars
   REGISTRATION = 'registration',
   // eslint-disable-next-line no-unused-vars
+  SIGN_IN = 'sign_in',
+  // eslint-disable-next-line no-unused-vars
   UPDATE = 'update',
 }
 
@@ -89,10 +91,10 @@ export default class User {
   gender!: UserGender;
 
   @Column({ name: 'username', length: 128, unique: true, update: false })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION] })
+  @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   username!: string;
 
   @Column({ name: 'email', length: 128, unique: true, select: false, update: false })
@@ -110,10 +112,28 @@ export default class User {
   phone!: string;
 
   @Column({ name: 'password', length: 72, select: false })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsString({
+    groups: [
+      UserValidationGroup.REGISTRATION,
+      UserValidationGroup.SIGN_IN,
+      UserValidationGroup.UPDATE,
+    ],
+  })
   @IsOptional({ groups: [UserValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @Length(8, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] }) // Clear password
+  @IsNotEmpty({
+    groups: [
+      UserValidationGroup.REGISTRATION,
+      UserValidationGroup.SIGN_IN,
+      UserValidationGroup.UPDATE,
+    ],
+  })
+  @Length(8, 64, {
+    groups: [
+      UserValidationGroup.REGISTRATION,
+      UserValidationGroup.SIGN_IN,
+      UserValidationGroup.UPDATE,
+    ],
+  })
   password!: string;
 
   @Column({ name: 'avatar', length: 128 })
