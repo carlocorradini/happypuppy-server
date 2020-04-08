@@ -6,7 +6,11 @@ import UserVerification from '@app/db/entity/UserVerification';
 import User from '@app/db/entity/User';
 import { OTPUtil } from '@app/utils';
 import config from '@app/config';
-import { EntityNotFoundError, DataMismatchError } from './error';
+import {
+  EntityNotFoundError,
+  DataMismatchError,
+  UserAlreadyVerifiedError,
+} from '@app/common/error';
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
@@ -42,14 +46,16 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
     const callback = async (em: EntityManager) => {
       const foundVerication = await em
         .createQueryBuilder(UserVerification, 'uv')
-        .innerJoin('uv.user', 'user')
-        .andWhere('user.verified = FALSE')
+        .leftJoinAndSelect('uv.user', 'user')
+        .addSelect('user.verified')
         .getOne();
 
       if (foundVerication === undefined)
         throw new EntityNotFoundError(
           'Verification codes does not match or User was already verified'
         );
+      if (foundVerication.user.verified === undefined || foundVerication.user.verified)
+        throw new UserAlreadyVerifiedError('User was already verified');
       if (
         foundVerication.otp_email !== userVerification.otp_email ||
         foundVerication.otp_phone !== userVerification.otp_phone

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { CryptError } from './error';
+import { CryptError } from '@app/common/error';
 
 export default class CryptUtil {
   private static readonly SALT_ROUNDS: number = 10;

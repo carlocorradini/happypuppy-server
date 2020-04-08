@@ -13,13 +13,16 @@ import {
   DeleteResult,
   // eslint-disable-next-line no-unused-vars
   EntityManager,
+  // eslint-disable-next-line no-unused-vars
+  SaveOptions,
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
+import { EntityUtil } from '@app/utils';
 // eslint-disable-next-line no-unused-vars
-import { DuplicateEntityError, UserNotVerifiedError } from './error';
+import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
-import { Duplicate } from './error/DuplicateEntityError';
+import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import UserVerificationRepository from './UserVerificationRepository';
 
 @EntityRepository(User)
@@ -46,11 +49,21 @@ export default class UserRepository extends AbstractRepository<User> {
       | FindConditions<User>,
     maybeOptions?: FindOneOptions<User>
   ): Promise<User> {
-    if (maybeOptions?.select) maybeOptions.select.push('verified');
-    // eslint-disable-next-line no-param-reassign
-    else if (maybeOptions !== undefined) maybeOptions.select = ['verified'];
-    // eslint-disable-next-line no-param-reassign
-    else maybeOptions = { select: ['verified'] };
+    const selectableColumns = EntityUtil.selectableColumns(User, ['verified']);
+
+    if (maybeOptions === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      maybeOptions = {
+        select: selectableColumns,
+      };
+    } else if (maybeOptions.select === undefined) {
+      // eslint-disable-next-line no-param-reassign
+      maybeOptions = Object.assign(maybeOptions, {
+        select: selectableColumns,
+      });
+    } else if (Array.isArray(maybeOptions.select)) {
+      maybeOptions.select.push('verified');
+    }
 
     return this.manager
       .findOneOrFail(User, optionsOrConditions as any, maybeOptions)
@@ -67,28 +80,7 @@ export default class UserRepository extends AbstractRepository<User> {
 
   public async saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
-      const fields = new Set<Duplicate>();
-      const users = await em.find(User, {
-        where: [{ username: user.username }, { email: user.email }, { phone: user.phone }],
-        select: ['username', 'email', 'phone'],
-      });
-
-      users.forEach((_user) => {
-        if (user.username === _user.username) {
-          fields.add({ property: 'username', value: user.username });
-        }
-        if (user.email === _user.email) {
-          fields.add({ property: 'email', value: user.email });
-        }
-        if (user.phone === _user.phone) {
-          fields.add({ property: 'phone', value: user.phone });
-        }
-      });
-
-      if (fields.size !== 0)
-        throw new DuplicateEntityError('Duplicate User found', Array.from(fields));
-
-      const newUser: User = await em.save(User, user);
+      const newUser: User = await UserRepository.saveUnique(user, em);
 
       await em.getCustomRepository(UserVerificationRepository).saveOrFail(newUser, em);
 
@@ -98,8 +90,6 @@ export default class UserRepository extends AbstractRepository<User> {
     if (entityManager === undefined) return this.manager.transaction(callback);
     return callback(entityManager);
   }
-
-  // TODO Validazione duplicati dato che per ora puoi aggiornare solo valori non unique
 
   public async updateOrFail(user: User): Promise<User>;
 
@@ -111,7 +101,7 @@ export default class UserRepository extends AbstractRepository<User> {
         where: { id: user.id },
       });
       await em.merge(User, userToUpdate, user);
-      return em.save(User, userToUpdate);
+      return UserRepository.saveUnique(userToUpdate, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
@@ -130,5 +120,33 @@ export default class UserRepository extends AbstractRepository<User> {
 
     if (entityManager === undefined) return this.manager.transaction(callback);
     return callback(entityManager);
+  }
+
+  public static async saveUnique(
+    user: User,
+    entityManager: EntityManager,
+    saveOptions?: SaveOptions
+  ): Promise<User> {
+    const duplicateFields = new Set<Duplicate>();
+    const uniqueColumns = EntityUtil.uniqueColumns(User);
+    const whereConditions = uniqueColumns.map((u) => {
+      return { [u]: user[u] };
+    });
+    const duplicateEntities = await entityManager.find(User, {
+      where: whereConditions,
+      select: uniqueColumns,
+    });
+    duplicateEntities.forEach((_user) => {
+      uniqueColumns.forEach((u) => {
+        if (user[u] === _user[u]) {
+          duplicateFields.add({ property: u.toString(), value: user[u] });
+        }
+      });
+    });
+
+    if (duplicateFields.size !== 0)
+      throw new DuplicateEntityError(`Duplicate User entity found`, Array.from(duplicateFields));
+
+    return entityManager.save(User, user, saveOptions);
   }
 }

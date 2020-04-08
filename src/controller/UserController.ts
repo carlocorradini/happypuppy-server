@@ -4,7 +4,7 @@ import { getRepository, getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 import UserRepository from '@app/db/repository/UserRepository';
-import { DuplicateEntityError, UserNotVerifiedError } from '@app/db/repository/error';
+import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class UserController {

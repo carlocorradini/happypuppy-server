@@ -10,9 +10,10 @@ import UserRepository from '@app/db/repository/UserRepository';
 import UserVerificationRepository from '@app/db/repository/UserVerificationRepository';
 import {
   UserNotVerifiedError,
+  UserAlreadyVerifiedError,
   EntityNotFoundError,
   DataMismatchError,
-} from '@app/db/repository/error';
+} from '@app/common/error';
 import { CryptUtil, JWTUtil } from '@app/utils';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
@@ -69,6 +70,8 @@ export default class AuthController {
 
         if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else if (ex instanceof UserAlreadyVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else if (ex instanceof DataMismatchError) {
           ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
         } else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
