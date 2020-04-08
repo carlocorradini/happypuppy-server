@@ -4,6 +4,7 @@
         "dbaeumer.vscode-eslint",
         "mikestead.dotenv",
         "orta.vscode-jest",
-        "gruntfuggly.todo-tree"
+        "gruntfuggly.todo-tree",
+        "eg2.vscode-npm-script"
     ]
 }

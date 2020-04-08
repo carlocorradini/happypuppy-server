@@ -25,7 +25,6 @@ export default class OTPHelper {
       to: user.phone,
     });
 
-    // TODO PhoneService
     Promise.resolve();
   }
 }
