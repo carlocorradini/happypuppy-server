@@ -16,6 +16,15 @@ export interface Configuration {
     MIGRATIONS: string;
     SUBSCRIBERS: string;
   };
+  SERVICE: {
+    EMAIL: {
+      HOST: string;
+      PORT: number;
+      SECURE: boolean;
+      USERNAME: string;
+      PASSWORD: string;
+    };
+  };
   SECURITY: {
     OTP: {
       EMAIL: {
@@ -56,6 +65,11 @@ const cleanConfig = envalid.cleanEnv(
     DATABASE_SSL: bool({ default: true, devDefault: false }),
     DATABASE_SYNCHRONIZE: bool({ default: false, devDefault: true }),
     DATABASE_LOGGING: bool({ default: false }),
+    SERVICE_EMAIL_HOST: str(),
+    SERVICE_EMAIL_PORT: port(),
+    SERVICE_EMAIL_SECURE: bool({ default: true, devDefault: false }),
+    SERVICE_EMAIL_USERNAME: str(),
+    SERVICE_EMAIL_PASSWORD: str(),
     SECURITY_BCRYPT_SALT_ROUNDS: num({
       default: 12,
       choices: [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32],
@@ -87,6 +101,15 @@ const config: Configuration = {
     ENTITIES: `./db/entity/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
     MIGRATIONS: `./db/migration/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
     SUBSCRIBERS: `/./db/subscriber/**/*.${cleanConfig.NODE_ENV === 'production' ? 'js' : 'ts'}`,
+  },
+  SERVICE: {
+    EMAIL: {
+      HOST: cleanConfig.SERVICE_EMAIL_HOST,
+      PORT: cleanConfig.SERVICE_EMAIL_PORT,
+      SECURE: cleanConfig.SERVICE_EMAIL_SECURE,
+      USERNAME: cleanConfig.SERVICE_EMAIL_USERNAME,
+      PASSWORD: cleanConfig.SERVICE_EMAIL_PASSWORD,
+    },
   },
   SECURITY: {
     OTP: {
