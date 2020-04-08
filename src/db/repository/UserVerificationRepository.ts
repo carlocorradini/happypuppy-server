@@ -46,9 +46,7 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
         .getOne();
 
       if (foundVerication === undefined)
-        throw new EntityNotFoundError(
-          'Verification codes does not match or User was already verified'
-        );
+        throw new EntityNotFoundError('User not found or was already verified');
       if (foundVerication.user.verified === undefined || foundVerication.user.verified)
         throw new UserAlreadyVerifiedError('User was already verified');
       if (
