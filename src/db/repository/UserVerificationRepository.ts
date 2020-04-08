@@ -4,6 +4,7 @@ import { AbstractRepository, EntityRepository, EntityManager } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import UserVerification from '@app/db/entity/UserVerification';
 import User from '@app/db/entity/User';
+import OTPHelper from '@app/helper/OTPHelper';
 import { OTPUtil } from '@app/util';
 import config from '@app/config';
 import {
@@ -14,30 +15,24 @@ import {
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
-  public async saveOrFail(user: User): Promise<UserVerification>;
-
-  public async saveOrFail(user: User, entityManager: EntityManager): Promise<UserVerification>;
-
   public async saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
     const callback = async (em: EntityManager) => {
-      const userVerification = em.create(UserVerification, {
-        user,
-        otp_email: await OTPUtil.digits(config.SECURITY.OTP.EMAIL.DIGITS),
-        otp_phone: await OTPUtil.digits(config.SECURITY.OTP.PHONE.DIGITS),
-      });
-      return em.save(UserVerification, userVerification);
+      const userVerification = await em.save(
+        UserVerification,
+        em.create(UserVerification, {
+          user,
+          otp_email: await OTPUtil.digits(config.SECURITY.OTP.EMAIL.DIGITS),
+          otp_phone: await OTPUtil.digits(config.SECURITY.OTP.PHONE.DIGITS),
+        })
+      );
+
+      await OTPHelper.send(user, userVerification);
+      return Promise.resolve(userVerification);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
     return callback(entityManager);
   }
-
-  public async verifyOrFail(userVerification: UserVerification): Promise<User>;
-
-  public async verifyOrFail(
-    userVerification: UserVerification,
-    entityManager: EntityManager
-  ): Promise<User>;
 
   public async verifyOrFail(
     userVerification: UserVerification,

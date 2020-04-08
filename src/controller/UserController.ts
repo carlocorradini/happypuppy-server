@@ -57,6 +57,8 @@ export default class UserController {
         logger.warn(`Failed to update User due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else if (ex instanceof DuplicateEntityError)
+          ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }

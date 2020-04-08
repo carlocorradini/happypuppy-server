@@ -15,6 +15,7 @@ import {
   EntityManager,
   // eslint-disable-next-line no-unused-vars
   SaveOptions,
+  Not,
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
@@ -27,18 +28,6 @@ import UserVerificationRepository from './UserVerificationRepository';
 
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
-  public findOneAndVerifiedOrFail(
-    id?: string | number | Date | ObjectID,
-    options?: FindOneOptions<User>
-  ): Promise<User>;
-
-  public findOneAndVerifiedOrFail(options?: FindOneOptions<User>): Promise<User>;
-
-  public findOneAndVerifiedOrFail(
-    conditions?: FindConditions<User>,
-    options?: FindOneOptions<User>
-  ): Promise<User>;
-
   public async findOneAndVerifiedOrFail(
     optionsOrConditions?:
       | string
@@ -74,10 +63,6 @@ export default class UserRepository extends AbstractRepository<User> {
       });
   }
 
-  public async saveOrFail(user: User): Promise<User>;
-
-  public async saveOrFail(user: User, entityManager: EntityManager): Promise<User>;
-
   public async saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
       const newUser: User = await UserRepository.saveUnique(user, em);
@@ -91,26 +76,18 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  public async updateOrFail(user: User): Promise<User>;
-
-  public async updateOrFail(user: User, entityManager: EntityManager): Promise<User>;
-
   public async updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
       const userToUpdate: User = await em.findOneOrFail(User, {
         where: { id: user.id },
       });
       await em.merge(User, userToUpdate, user);
-      return UserRepository.saveUnique(userToUpdate, em);
+      return UserRepository.updateUnique(userToUpdate, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
     return callback(entityManager);
   }
-
-  public async deleteOrFail(user: User): Promise<DeleteResult>;
-
-  public async deleteOrFail(user: User, entityManager: EntityManager): Promise<DeleteResult>;
 
   public async deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
@@ -122,7 +99,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  public static async saveUnique(
+  private static async saveUnique(
     user: User,
     entityManager: EntityManager,
     saveOptions?: SaveOptions
@@ -132,6 +109,35 @@ export default class UserRepository extends AbstractRepository<User> {
     const whereConditions = uniqueColumns.map((u) => {
       return { [u]: user[u] };
     });
+    const duplicateEntities = await entityManager.find(User, {
+      where: whereConditions,
+      select: uniqueColumns,
+    });
+    duplicateEntities.forEach((_user) => {
+      uniqueColumns.forEach((u) => {
+        if (user[u] === _user[u]) {
+          duplicateFields.add({ property: u.toString(), value: user[u] });
+        }
+      });
+    });
+
+    if (duplicateFields.size !== 0)
+      throw new DuplicateEntityError(`Duplicate User entity found`, Array.from(duplicateFields));
+
+    return entityManager.save(User, user, saveOptions);
+  }
+
+  private static async updateUnique(
+    user: User,
+    entityManager: EntityManager,
+    saveOptions?: SaveOptions
+  ): Promise<User> {
+    const duplicateFields = new Set<Duplicate>();
+    const uniqueColumns = EntityUtil.uniqueColumns(User);
+    const whereConditions = uniqueColumns.map((u) => {
+      return { [u]: user[u], id: Not(user.id) };
+    });
+
     const duplicateEntities = await entityManager.find(User, {
       where: whereConditions,
       select: uniqueColumns,

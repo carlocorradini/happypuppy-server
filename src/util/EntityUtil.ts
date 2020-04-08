@@ -19,13 +19,6 @@ export default class EntityUtil {
     return this.storage().filterColumns(entity);
   }
 
-  public static selectableColumns<E extends Function>(entity: E): (keyof E['prototype'])[];
-
-  public static selectableColumns<E extends Function>(
-    entity: E,
-    addColumns: (keyof E['prototype'])[]
-  ): (keyof E['prototype'])[];
-
   public static selectableColumns<E extends Function>(
     entity: E,
     addColumns?: (keyof E)[]

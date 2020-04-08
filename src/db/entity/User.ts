@@ -98,17 +98,17 @@ export default class User {
   username!: string;
 
   @Column({ name: 'email', length: 128, unique: true, select: false, update: false })
-  @IsEmail(undefined, { groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @Length(3, 128, { groups: [UserValidationGroup.REGISTRATION] })
+  @IsEmail(undefined, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @Length(3, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   email!: string;
 
   @Column({ name: 'phone', length: 15, unique: true, select: false, update: false })
-  @IsMobilePhone('any', { groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION] })
+  @IsMobilePhone('any', { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   phone!: string;
 
   @Column({ name: 'password', length: 72, select: false })

@@ -24,6 +24,11 @@ export interface Configuration {
       USERNAME: string;
       PASSWORD: string;
     };
+    PHONE: {
+      SID: string;
+      TOKEN: string;
+      NUMBER_FROM: string;
+    };
   };
   SECURITY: {
     OTP: {
@@ -70,6 +75,9 @@ const cleanConfig = envalid.cleanEnv(
     SERVICE_EMAIL_SECURE: bool({ default: true, devDefault: false }),
     SERVICE_EMAIL_USERNAME: str(),
     SERVICE_EMAIL_PASSWORD: str(),
+    SERVICE_PHONE_SID: str(),
+    SERVICE_PHONE_TOKEN: str(),
+    SERVICE_PHONE_NUMBER_FROM: str(),
     SECURITY_BCRYPT_SALT_ROUNDS: num({
       default: 12,
       choices: [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32],
@@ -85,7 +93,7 @@ const cleanConfig = envalid.cleanEnv(
   }
 );
 
-logger.info('Environment variables loaded');
+logger.debug('Environment variables loaded');
 
 const config: Configuration = {
   NODE: {
@@ -109,6 +117,11 @@ const config: Configuration = {
       SECURE: cleanConfig.SERVICE_EMAIL_SECURE,
       USERNAME: cleanConfig.SERVICE_EMAIL_USERNAME,
       PASSWORD: cleanConfig.SERVICE_EMAIL_PASSWORD,
+    },
+    PHONE: {
+      SID: cleanConfig.SERVICE_PHONE_SID,
+      TOKEN: cleanConfig.SERVICE_PHONE_TOKEN,
+      NUMBER_FROM: cleanConfig.SERVICE_PHONE_NUMBER_FROM,
     },
   },
   SECURITY: {
@@ -138,6 +151,6 @@ const config: Configuration = {
   },
 };
 
-logger.debug('Configuration object constructed');
+logger.info('Configuration object constructed');
 
 export default config;

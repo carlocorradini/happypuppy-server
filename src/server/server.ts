@@ -12,6 +12,7 @@ import config from '@app/config';
 import logger from '@app/logger';
 import routes from '@app/route';
 import { NotFoundMiddleware, ErrorMiddleware } from '@app/middleware';
+import { EmailService, PhoneService } from '@app/service';
 
 export default class Server {
   public static readonly DEFAULT_PORT = 0;
@@ -25,11 +26,11 @@ export default class Server {
   private constructor() {
     this.server = express();
     logger.debug('Server initialized');
-    this.config();
-    logger.debug('Server configured');
+    this.configure();
+    logger.info('Server configured');
   }
 
-  private config(): void {
+  private configure(): void {
     this.server
       .options('*', cors())
       .use(cors())
@@ -50,6 +51,9 @@ export default class Server {
       .use('/', routes)
       .use(NotFoundMiddleware.handle)
       .use(ErrorMiddleware.handle);
+
+    EmailService.configure();
+    PhoneService.configure();
   }
 
   public static getInstance(): Server {
