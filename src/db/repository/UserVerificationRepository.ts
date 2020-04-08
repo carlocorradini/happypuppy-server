@@ -4,7 +4,7 @@ import { AbstractRepository, EntityRepository, EntityManager } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import UserVerification from '@app/db/entity/UserVerification';
 import User from '@app/db/entity/User';
-import { OTPUtil } from '@app/utils';
+import { OTPUtil } from '@app/util';
 import config from '@app/config';
 import {
   EntityNotFoundError,

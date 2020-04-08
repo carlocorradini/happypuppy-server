@@ -14,7 +14,7 @@ import {
   EntityNotFoundError,
   DataMismatchError,
 } from '@app/common/error';
-import { CryptUtil, JWTUtil } from '@app/utils';
+import { CryptUtil, JWTUtil } from '@app/util';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class AuthController {

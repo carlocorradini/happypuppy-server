@@ -21,7 +21,7 @@ import {
   IsMobilePhone,
 } from 'class-validator';
 import config from '@app/config';
-import { CryptUtil } from '@app/utils';
+import { CryptUtil } from '@app/util';
 import Puppy from './Puppy';
 
 export enum UserValidationGroup {

@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
-import { EntityUtil } from '@app/utils';
+import { EntityUtil } from '@app/util';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars

@@ -2,7 +2,7 @@
 import { Response, Request, NextFunction } from 'express';
 import { UnauthorizedError } from 'express-jwt';
 import logger from '@app/logger';
-import { EnvUtil } from '@app/utils';
+import { EnvUtil } from '@app/util';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class ErrorMiddleware {
