@@ -11,6 +11,8 @@ export default class OTPHelper {
       from: '"Happy Puppy" <otp@happypuppy.com>',
       to: user.email,
       subject: 'Happy Puppy OTP code',
+      // TODO Remove Typescript ignore
+      // @ts-ignore
       template: 'otp',
       context: {
         name: user.name,

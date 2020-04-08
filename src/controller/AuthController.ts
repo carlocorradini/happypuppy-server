@@ -14,8 +14,8 @@ import {
   EntityNotFoundError,
   DataMismatchError,
 } from '@app/common/error';
-import { CryptUtil, JWTUtil } from '@app/util';
-import { ResponseHelper, HttpStatusCode } from '@app/helper';
+import { CryptUtil } from '@app/util';
+import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 
 export default class AuthController {
   public static signIn(req: Request, res: Response): void {
@@ -31,7 +31,7 @@ export default class AuthController {
         return CryptUtil.compareOrFail(req.body.password, user.password);
       })
       .then(() => {
-        return JWTUtil.sign({
+        return JWTHelper.sign({
           id: user.id,
           role: user.role,
         });
@@ -55,7 +55,7 @@ export default class AuthController {
     getCustomRepository(UserVerificationRepository)
       .verifyOrFail(userVerification)
       .then((user) => {
-        return JWTUtil.sign({
+        return JWTHelper.sign({
           id: user.id,
           role: user.role,
         });

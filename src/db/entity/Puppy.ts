@@ -39,9 +39,7 @@ export default class Puppy {
   @UpdateDateColumn({ name: 'updated_at', select: false })
   updated_at!: Date;
 
-  // TODO type?
-  // eslint-disable-next-line no-unused-vars
-  @ManyToOne((_type) => User, (user) => user.puppies)
+  @ManyToOne(() => User, (user) => user.puppies)
   @JoinColumn({ name: 'user_id' })
   user!: Promise<User>;
 }

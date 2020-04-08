@@ -6,9 +6,7 @@ import User from './User';
 
 @Entity('user_verification')
 export default class UserVerification {
-  // TODO type???
-  // eslint-disable-next-line no-unused-vars
-  @OneToOne((_type) => User, { primary: true })
+  @OneToOne(() => User, { primary: true })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
