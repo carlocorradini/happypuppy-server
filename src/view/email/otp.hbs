@@ -1,2 +1,82 @@
-<h1>Hi {{ name }} {{ surname }}</h1>
-<p>Code: {{ otp_code }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Happy Puppy OTP code</title>
+    <style type="text/css">
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+        line-height: inherit;
+      }
+      html {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #676767;
+      }
+      .card-wrapper {
+        position: relative;
+        width: 840px;
+        height: 440px;
+        box-shadow: 0px 0px 100px 25px rgba(0, 0, 0, 0.2);
+      }
+      .card {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;  
+        color: #000;
+        background-color: #effdfd;
+        background-image: url("https://images.unsplash.com/photo-1544197807-bb503430e22d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80");
+        background-position: right;
+      }
+      .card__content {
+        position: absolute;
+        top: 150px;
+        left: 375px;
+      }
+      .card__otp {
+        margin-left: -4px;
+        font-size: 75px;
+        font-weight: bold;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+      .card__text {
+        font-size: 16px;
+        max-width: 390px;
+      }
+      .card__logo {
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
+        width: 50px;
+        height: 50px;
+        background-image: url("https://i.imgur.com/QNETrRx.png");
+        background-size: cover;
+      }
+    </style>
+</head>
+<body>
+<div class="card-wrapper">
+  <div class="card">
+    <div class="card__content">
+      <div class="card__otp">{{ otp_code }}</div>
+      <div class="card__text">
+        <p>Hi {{ name }} {{ surname }}</p>
+        <p>Welcome to Happy Puppy</p>
+      </div>
+    </div>
+    <div class="card__logo"/>
+  </div>
+</div>
+</body>
+</html>
