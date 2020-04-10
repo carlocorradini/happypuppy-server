@@ -1,6 +1,5 @@
-/* eslint-disable no-dupe-class-members */
 // eslint-disable-next-line no-unused-vars
-import { getMetadataArgsStorage } from 'typeorm';
+import { getMetadataArgsStorage, ObjectType } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
 // eslint-disable-next-line no-unused-vars
@@ -15,27 +14,27 @@ export default class EntityUtil {
     return column.propertyName;
   }
 
-  public static columns(entity: string | Function): ColumnMetadataArgs[] {
+  public static columns<Entity>(entity: ObjectType<Entity>): ColumnMetadataArgs[] {
     return this.storage().filterColumns(entity);
   }
 
-  public static selectableColumns<E extends Function>(
-    entity: E,
-    addColumns?: (keyof E['prototype'])[]
-  ): (keyof E['prototype'])[] {
+  public static selectableColumns<Entity>(
+    entity: ObjectType<Entity>,
+    addColumns?: (keyof Entity)[]
+  ) {
     return this.columns(entity)
       .filter((column) => {
         return column.options.select === undefined || column.options.select === true;
       })
       .map(this.getPropertyName)
-      .concat(Array.isArray(addColumns) ? (addColumns as string[]) : []);
+      .concat(Array.isArray(addColumns) ? (addColumns as string[]) : []) as (keyof Entity)[];
   }
 
-  public static uniqueColumns<E extends Function>(entity: E): (keyof E['prototype'])[] {
+  public static uniqueColumns<Entity>(entity: ObjectType<Entity>): (keyof Entity)[] {
     return this.columns(entity)
       .filter((column) => {
         return column.options.unique === true;
       })
-      .map(this.getPropertyName);
+      .map(this.getPropertyName) as (keyof Entity)[];
   }
 }
