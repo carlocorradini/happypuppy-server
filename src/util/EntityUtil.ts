@@ -21,7 +21,7 @@ export default class EntityUtil {
 
   public static selectableColumns<E extends Function>(
     entity: E,
-    addColumns?: (keyof E)[]
+    addColumns?: (keyof E['prototype'])[]
   ): (keyof E['prototype'])[] {
     return this.columns(entity)
       .filter((column) => {

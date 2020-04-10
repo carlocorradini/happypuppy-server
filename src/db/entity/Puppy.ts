@@ -41,5 +41,5 @@ export default class Puppy {
 
   @ManyToOne(() => User, (user) => user.puppies)
   @JoinColumn({ name: 'user_id' })
-  user!: Promise<User>;
+  user!: User;
 }

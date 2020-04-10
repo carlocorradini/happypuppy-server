@@ -38,6 +38,8 @@ export enum UserGender {
   MALE = 'male',
   // eslint-disable-next-line no-unused-vars
   FEMALE = 'female',
+  // eslint-disable-next-line no-unused-vars
+  UNKNOWN = 'unknown',
 }
 
 export enum UserRole {
@@ -85,9 +87,9 @@ export default class User {
   surname!: string;
 
   @Column({ name: 'gender', type: 'enum', enum: UserGender, update: false })
-  @IsEnum(UserGender, { groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
+  @IsEnum(UserGender, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   gender!: UserGender;
 
   @Column({ name: 'username', length: 128, unique: true, update: false })
@@ -151,7 +153,7 @@ export default class User {
   updated_at!: Date;
 
   @OneToMany(() => Puppy, (puppy) => puppy.user)
-  puppies!: Promise<Puppy[]>;
+  puppies!: Puppy[];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -171,7 +173,7 @@ export default class User {
         break;
       }
       default: {
-        this.avatar = 'unknown';
+        this.avatar = UserGender.UNKNOWN;
         break;
       }
     }
