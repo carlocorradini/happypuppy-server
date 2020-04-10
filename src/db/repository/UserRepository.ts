@@ -102,12 +102,18 @@ export default class UserRepository extends AbstractRepository<User> {
   private static async saveUnique(
     user: User,
     entityManager: EntityManager,
-    saveOptions?: SaveOptions
+    saveOptions?: SaveOptions,
+    isUpdateOperation?: boolean
   ): Promise<User> {
     const duplicateFields = new Set<Duplicate>();
     const uniqueColumns = EntityUtil.uniqueColumns(User);
     const whereConditions = uniqueColumns.map((u) => {
-      return { [u]: user[u] };
+      return {
+        [u]: user[u],
+        ...(isUpdateOperation === true && {
+          id: Not(user.id),
+        }),
+      };
     });
     const duplicateEntities = await entityManager.find(User, {
       where: whereConditions,
@@ -132,27 +138,6 @@ export default class UserRepository extends AbstractRepository<User> {
     entityManager: EntityManager,
     saveOptions?: SaveOptions
   ): Promise<User> {
-    const duplicateFields = new Set<Duplicate>();
-    const uniqueColumns = EntityUtil.uniqueColumns(User);
-    const whereConditions = uniqueColumns.map((u) => {
-      return { [u]: user[u], id: Not(user.id) };
-    });
-
-    const duplicateEntities = await entityManager.find(User, {
-      where: whereConditions,
-      select: uniqueColumns,
-    });
-    duplicateEntities.forEach((_user) => {
-      uniqueColumns.forEach((u) => {
-        if (user[u] === _user[u]) {
-          duplicateFields.add({ property: u.toString(), value: user[u] });
-        }
-      });
-    });
-
-    if (duplicateFields.size !== 0)
-      throw new DuplicateEntityError(`Duplicate User entity found`, Array.from(duplicateFields));
-
-    return entityManager.save(User, user, saveOptions);
+    return this.saveUnique(user, entityManager, saveOptions, true);
   }
 }
