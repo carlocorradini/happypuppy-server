@@ -18,7 +18,7 @@
     "lint:staged": "npx eslint --fix",
     "prebuild": "npm run clean",
     "build": "npx ttsc --p ./tsconfig.json",
-    "postbuild": "npx ts-node ./script/buildCopy.ts",
+    "postbuild": "npx ts-node ./script/build.ts",
     "test": "exit 0",
     "test:staged": "exit 0",
     "prestart": "npm install --only=prod",
