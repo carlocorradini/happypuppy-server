@@ -5,7 +5,7 @@ import logger from '@app/logger';
 import Puppy from '@app/db/entity/Puppy';
 import PuppyRepository from '@app/db/repository/PuppyRepository';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
-import { DuplicateEntityError, OwnerMismatchError } from '@app/common/error';
+import { DuplicateEntityError } from '@app/common/error';
 import User from '@app/db/entity/User';
 
 export default class PuppyController {
@@ -63,8 +63,6 @@ export default class PuppyController {
         logger.warn(`Failed to update Puppy ${puppy.id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
-        else if (ex instanceof OwnerMismatchError)
-          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
@@ -88,8 +86,6 @@ export default class PuppyController {
         logger.warn(`Failed to delete Puppy ${puppy.id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
-        else if (ex instanceof OwnerMismatchError)
-          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }

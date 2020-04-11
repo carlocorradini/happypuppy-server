@@ -4,4 +4,3 @@ export { default as UserNotVerifiedError } from './UserNotVerifiedError';
 export { default as UserAlreadyVerifiedError } from './UserAlreadyVerifiedError';
 export { default as EntityNotFoundError } from './EntityNotFoundError';
 export { default as DataMismatchError } from './DataMismatchError';
-export { default as OwnerMismatchError } from './OwnerMismatchError';

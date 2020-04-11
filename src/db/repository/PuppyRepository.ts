@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import Puppy from '@app/db/entity/Puppy';
 // eslint-disable-next-line no-unused-vars
-import { DuplicateEntityError, OwnerMismatchError } from '@app/common/error';
+import { DuplicateEntityError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import { EntityUtil } from '@app/util';
@@ -29,10 +29,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
 
   public async updateOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
-      const puppyToUpdate: Puppy = await em.findOneOrFail(Puppy, puppy.id);
-      if (puppy.user.id !== puppyToUpdate.user_id) {
-        throw new OwnerMismatchError('Puppy owner does not match');
-      }
+      const puppyToUpdate: Puppy = await em.findOneOrFail(Puppy, puppy.id, {
+        where: { user: puppy.user },
+      });
       await em.merge(Puppy, puppyToUpdate, puppy);
       return PuppyRepository.updateUnique(puppyToUpdate, em);
     };
@@ -43,10 +42,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
 
   public async deleteOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
-      const puppyToDelete = await em.findOneOrFail(Puppy, puppy.id);
-      if (puppy.user.id !== puppyToDelete.user_id) {
-        throw new OwnerMismatchError('Puppy owner does not match');
-      }
+      await em.findOneOrFail(Puppy, puppy.id, {
+        where: { user: puppy.user },
+      });
       return em.delete(Puppy, puppy.id);
     };
 
