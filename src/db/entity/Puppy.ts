@@ -8,8 +8,11 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  RelationId,
+  BeforeInsert,
 } from 'typeorm';
 import { IsString, Length, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator';
+import config from '@app/config';
 import User from './User';
 
 export enum PuppyValidationGroup {
@@ -33,13 +36,33 @@ export default class Puppy {
   @Length(1, 64, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   name!: string;
 
+  @Column({ name: 'avatar', length: 128 })
+  @IsString({ groups: [PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
+  @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsNotEmpty({ groups: [PuppyValidationGroup.UPDATE] })
+  @Length(1, 128, { groups: [PuppyValidationGroup.UPDATE] })
+  avatar!: string;
+
+  @ManyToOne(() => User, (user) => user.puppies, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user!: User;
+
+  @RelationId((puppy: Puppy) => puppy.user)
+  @IsEmpty({ always: true })
+  user_id!: string;
+
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', select: false })
   updated_at!: Date;
 
-  @ManyToOne(() => User, (user) => user.puppies)
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
+  @BeforeInsert()
+  defaultAvatar() {
+    this.avatar =
+      config.RESOURCE.IMAGE.PUPPY.CONTEXT_PATH +
+      new Date().toISOString() +
+      config.RESOURCE.IMAGE.PUPPY.EXT;
+  }
 }

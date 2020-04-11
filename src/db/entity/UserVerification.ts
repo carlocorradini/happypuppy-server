@@ -6,7 +6,7 @@ import User from './User';
 
 @Entity('user_verification')
 export default class UserVerification {
-  @OneToOne(() => User, { primary: true })
+  @OneToOne(() => User, { primary: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 

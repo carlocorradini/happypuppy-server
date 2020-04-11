@@ -14,10 +14,12 @@ export default class UserController {
     getCustomRepository(UserRepository)
       .findOneAndVerifiedOrFail(id)
       .then((user) => {
+        logger.info(`Found User ${user.id}`);
+
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
-        logger.warn(`Failed to find User with id ${id} due to ${ex.message}`);
+        logger.warn(`Failed to find User ${id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound' || ex instanceof UserNotVerifiedError)
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
@@ -30,9 +32,10 @@ export default class UserController {
 
     getCustomRepository(UserRepository)
       .saveOrFail(user)
-      .then((_user) => {
-        logger.info(`Registered User with id ${_user.id}`);
-        ResponseHelper.send(res, HttpStatusCode.CREATED, { id: _user.id });
+      .then((newUser) => {
+        logger.info(`Registered User ${newUser.id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.CREATED, { id: newUser.id });
       })
       .catch((ex) => {
         logger.warn(`Failed to register User due to ${ex.message}`);
@@ -49,12 +52,12 @@ export default class UserController {
 
     getCustomRepository(UserRepository)
       .updateOrFail(user)
-      .then((_user) => {
-        logger.info(`Updated User with id ${_user.id}`);
+      .then((upUser) => {
+        logger.info(`Updated User ${upUser.id}`);
         ResponseHelper.send(res, HttpStatusCode.OK);
       })
       .catch((ex) => {
-        logger.warn(`Failed to update User due to ${ex.message}`);
+        logger.warn(`Failed to update User ${user.id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else if (ex instanceof DuplicateEntityError)
@@ -69,11 +72,12 @@ export default class UserController {
     getCustomRepository(UserRepository)
       .deleteOrFail(getRepository(User).create({ id }))
       .then(() => {
-        logger.info(`Deleted User with id ${id}`);
+        logger.info(`Deleted User ${id}`);
+
         ResponseHelper.send(res, HttpStatusCode.OK);
       })
       .catch((ex) => {
-        logger.warn(`Failed to delete User due to ${ex.message}`);
+        logger.warn(`Failed to delete User ${id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);

@@ -86,9 +86,15 @@ export default class User {
   @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   surname!: string;
 
-  @Column({ name: 'gender', type: 'enum', enum: UserGender, update: false })
+  @Column({
+    name: 'gender',
+    type: 'enum',
+    enum: UserGender,
+    default: UserGender.UNKNOWN,
+    update: false,
+  })
   @IsEnum(UserGender, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @IsNotEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   gender!: UserGender;
 
@@ -146,14 +152,14 @@ export default class User {
   @Length(1, 128, { groups: [UserValidationGroup.UPDATE] })
   avatar!: string;
 
+  @OneToMany(() => Puppy, (puppy) => puppy.user)
+  puppies!: Puppy[];
+
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', select: false })
   updated_at!: Date;
-
-  @OneToMany(() => Puppy, (puppy) => puppy.user)
-  puppies!: Puppy[];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -162,23 +168,8 @@ export default class User {
   }
 
   @BeforeInsert()
-  async defaultAvatar() {
-    switch (this.gender) {
-      case UserGender.MALE: {
-        this.avatar = UserGender.MALE;
-        break;
-      }
-      case UserGender.FEMALE: {
-        this.avatar = UserGender.FEMALE;
-        break;
-      }
-      default: {
-        this.avatar = UserGender.UNKNOWN;
-        break;
-      }
-    }
-
+  defaultAvatar() {
     this.avatar =
-      config.RESOURCE.IMAGE.USER.CONTEXT_PATH + this.avatar + config.RESOURCE.IMAGE.USER.EXT;
+      config.RESOURCE.IMAGE.USER.CONTEXT_PATH + this.gender + config.RESOURCE.IMAGE.USER.EXT;
   }
 }

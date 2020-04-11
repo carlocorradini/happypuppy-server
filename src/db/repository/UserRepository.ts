@@ -19,15 +19,30 @@ import {
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
-import { EntityUtil } from '@app/util';
+import { EntityUtil, CryptUtil } from '@app/util';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
+import { JWTHelper } from '@app/helper';
 import UserVerificationRepository from './UserVerificationRepository';
 
 @EntityRepository(User)
 export default class UserRepository extends AbstractRepository<User> {
+  public async signInOrFail(user: User): Promise<string> {
+    const foundUser: User = await this.manager.findOneOrFail(
+      User,
+      { username: user.username },
+      { select: ['id', 'username', 'password', 'verified'] }
+    );
+    await CryptUtil.compareOrFail(user.password, foundUser.password);
+    if (!foundUser.verified) throw new UserNotVerifiedError('User not verified');
+    return JWTHelper.sign({
+      id: foundUser.id,
+      role: foundUser.role,
+    });
+  }
+
   public async findOneAndVerifiedOrFail(
     optionsOrConditions?:
       | string
@@ -54,21 +69,19 @@ export default class UserRepository extends AbstractRepository<User> {
       maybeOptions.select.push('verified');
     }
 
-    return this.manager
-      .findOneOrFail(User, optionsOrConditions as any, maybeOptions)
-      .then((user) => {
-        return !user.verified
-          ? Promise.reject(new UserNotVerifiedError('User is not verified'))
-          : Promise.resolve(user);
-      });
+    const user: User = await this.manager.findOneOrFail(
+      User,
+      optionsOrConditions as any,
+      maybeOptions
+    );
+    if (!user.verified) throw new UserNotVerifiedError('User not verified');
+    return Promise.resolve(user);
   }
 
   public async saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
       const newUser: User = await UserRepository.saveUnique(user, em);
-
       await em.getCustomRepository(UserVerificationRepository).saveOrFail(newUser, em);
-
       return Promise.resolve(newUser);
     };
 
@@ -78,9 +91,7 @@ export default class UserRepository extends AbstractRepository<User> {
 
   public async updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
-      const userToUpdate: User = await em.findOneOrFail(User, {
-        where: { id: user.id },
-      });
+      const userToUpdate: User = await em.findOneOrFail(User, user.id);
       await em.merge(User, userToUpdate, user);
       return UserRepository.updateUnique(userToUpdate, em);
     };
@@ -91,8 +102,8 @@ export default class UserRepository extends AbstractRepository<User> {
 
   public async deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
-      await em.findOneOrFail(User, user);
-      return em.delete(User, user);
+      await em.findOneOrFail(User, user.id);
+      return em.delete(User, user.id);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);

@@ -1,9 +1,8 @@
 // eslint-disable-next-line no-unused-vars
-import { AbstractRepository, EntityRepository, EntityManager } from 'typeorm';
+import { AbstractRepository, EntityRepository, EntityManager, getCustomRepository } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import UserVerification from '@app/db/entity/UserVerification';
 import User from '@app/db/entity/User';
-import OTPHelper from '@app/helper/OTPHelper';
 import { OTPUtil } from '@app/util';
 import config from '@app/config';
 import {
@@ -11,6 +10,8 @@ import {
   DataMismatchError,
   UserAlreadyVerifiedError,
 } from '@app/common/error';
+import { JWTHelper, OTPHelper } from '@app/helper';
+import UserRepository from './UserRepository';
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
@@ -36,8 +37,9 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
   public async verifyOrFail(
     userVerification: UserVerification,
     entityManager?: EntityManager
-  ): Promise<User> {
+  ): Promise<string> {
     const callback = async (em: EntityManager) => {
+      // TODO ricontrolla
       const foundVerication = await em
         .createQueryBuilder(UserVerification, 'uv')
         .leftJoinAndSelect('uv.user', 'user')
@@ -46,7 +48,7 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
 
       if (foundVerication === undefined)
         throw new EntityNotFoundError('User not found or was already verified');
-      if (foundVerication.user.verified === undefined || foundVerication.user.verified)
+      if (foundVerication.user.verified)
         throw new UserAlreadyVerifiedError('User was already verified');
       if (
         foundVerication.otp_email !== userVerification.otp_email ||
@@ -55,7 +57,13 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
         throw new DataMismatchError('OTP codes does not match');
       }
 
-      return em.save(em.create(User, { id: foundVerication.user_id, verified: true }));
+      const user: User = await getCustomRepository(UserRepository).updateOrFail(
+        em.create(User, { id: foundVerication.user_id, verified: true })
+      );
+      return JWTHelper.sign({
+        id: user.id,
+        role: user.role,
+      });
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
