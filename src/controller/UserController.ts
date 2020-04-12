@@ -6,6 +6,7 @@ import User from '@app/db/entity/User';
 import UserRepository from '@app/db/repository/UserRepository';
 import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
+import { ImageService } from '@app/service';
 
 export default class UserController {
   public static find(req: Request, res: Response): void {
@@ -81,6 +82,22 @@ export default class UserController {
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static uploadAvatar(req: Request, res: Response): void {
+    const id: string = req.user?.id ? req.user.id : '';
+
+    ImageService.upload(req.file, { folder: 'happypuppy/upload/user' })
+      .then((result) => {
+        logger.info(`Changed avatar for User ${id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, result);
+      })
+      .catch((ex) => {
+        logger.error(`Failed to change avatar for User ${id} due to ${ex.message}`);
+
+        ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
 }

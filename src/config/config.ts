@@ -27,7 +27,12 @@ export interface Configuration {
     PHONE: {
       SID: string;
       TOKEN: string;
-      NUMBER_FROM: string;
+      NUMBER: string;
+    };
+    IMAGE: {
+      CLOUD: string;
+      KEY: string;
+      SECRET: string;
     };
   };
   SECURITY: {
@@ -77,7 +82,10 @@ const cleanConfig = envalid.cleanEnv(
     SERVICE_EMAIL_PASSWORD: str(),
     SERVICE_PHONE_SID: str(),
     SERVICE_PHONE_TOKEN: str(),
-    SERVICE_PHONE_NUMBER_FROM: str(),
+    SERVICE_PHONE_NUMBER: str(),
+    SERVICE_IMAGE_CLOUD: str(),
+    SERVICE_IMAGE_KEY: str(),
+    SERVICE_IMAGE_SECRET: str(),
     SECURITY_BCRYPT_SALT_ROUNDS: num({
       default: 12,
       choices: [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32],
@@ -121,7 +129,12 @@ const config: Configuration = {
     PHONE: {
       SID: cleanConfig.SERVICE_PHONE_SID,
       TOKEN: cleanConfig.SERVICE_PHONE_TOKEN,
-      NUMBER_FROM: cleanConfig.SERVICE_PHONE_NUMBER_FROM,
+      NUMBER: cleanConfig.SERVICE_PHONE_NUMBER,
+    },
+    IMAGE: {
+      CLOUD: cleanConfig.SERVICE_IMAGE_CLOUD,
+      KEY: cleanConfig.SERVICE_IMAGE_KEY,
+      SECRET: cleanConfig.SERVICE_IMAGE_SECRET,
     },
   },
   SECURITY: {

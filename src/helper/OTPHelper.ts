@@ -23,7 +23,7 @@ export default class OTPHelper {
 
     await PhoneService.send({
       body: `${user.name} ${user.surname} OTP code: ${userVerification.otp_phone}`,
-      from: config.SERVICE.PHONE.NUMBER_FROM,
+      from: config.SERVICE.PHONE.NUMBER,
       to: user.phone,
     });
 
