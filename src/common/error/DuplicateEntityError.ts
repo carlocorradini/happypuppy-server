@@ -10,6 +10,6 @@ export default class DuplicateError extends Error {
     super(m);
     this.errors = errors;
 
-    Object.setPrototypeOf(this, DuplicateError.prototype);
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

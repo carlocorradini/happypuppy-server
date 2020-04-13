@@ -21,7 +21,7 @@ export default class ValidatorMiddleware {
     classType: ClassType<T>,
     validationGroup: string | string[] = []
   ) {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction) => {
       transformAndValidate(classType, req.body, {
         validator: {
           groups: Array.isArray(validationGroup) ? validationGroup : [validationGroup],

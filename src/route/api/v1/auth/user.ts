@@ -1,9 +1,8 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
-import multer from 'multer';
 import User, { UserValidationGroup } from '@app/db/entity/User';
 import { UserController } from '@app/controller';
-import { ValidatorMiddleware } from '@app/middleware';
+import { ValidatorMiddleware, FileMiddleware } from '@app/middleware';
 
 const router = Router();
 
@@ -27,8 +26,12 @@ router.post(
   UserController.register
 );
 
-const upload = multer({ storage: multer.memoryStorage() });
-router.post('/avatar', upload.single('avatar'), UserController.updateAvatar);
+router.post(
+  '/avatar',
+  FileMiddleware.memoryLoader.single('image'),
+  FileMiddleware.checkSingle('image'),
+  UserController.updateAvatar
+);
 
 router.patch(
   '',
