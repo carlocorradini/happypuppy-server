@@ -39,11 +39,11 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
     entityManager?: EntityManager
   ): Promise<string> {
     const callback = async (em: EntityManager) => {
-      // TODO ricontrolla
       const foundVerication = await em
         .createQueryBuilder(UserVerification, 'uv')
         .leftJoinAndSelect('uv.user', 'user')
         .addSelect('user.verified')
+        .where('uv.user_id = :user_id', { user_id: userVerification.user_id })
         .getOne();
 
       if (foundVerication === undefined)
