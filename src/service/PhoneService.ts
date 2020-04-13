@@ -7,6 +7,7 @@ import {
 } from 'twilio/lib/rest/api/v2010/account/message';
 import config from '@app/config';
 import logger from '@app/logger';
+import { ConfigurationError } from '@app/common/error';
 
 export default class PhoneService {
   private static transport: Twilio;
@@ -24,6 +25,8 @@ export default class PhoneService {
   }
 
   public static send(phoneOptions: MessageListInstanceCreateOptions): Promise<MessageInstance> {
+    if (!this.configured) throw new ConfigurationError('Phone Service is not configured');
+
     return new Promise((resolve, reject) => {
       this.transport.messages
         .create(phoneOptions)

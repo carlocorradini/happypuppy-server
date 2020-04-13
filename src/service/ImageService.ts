@@ -3,6 +3,7 @@ import cloudinary from 'cloudinary';
 import { types } from '@app/common';
 import logger from '@app/logger';
 import config from '@app/config';
+import { ConfigurationError } from '@app/common/error';
 
 export enum ImageType {
   // eslint-disable-next-line no-unused-vars
@@ -59,6 +60,8 @@ export default class ImageService {
     image: Express.Multer.File,
     options: ImageOptions<T>
   ): Promise<cloudinary.UploadApiResponse> {
+    if (!this.configured) throw new ConfigurationError('Image Service is not configured');
+
     return new Promise((resolve, reject) => {
       cloudinary.v2.uploader
         .upload_stream(this.transformOptions(options), (err, result) => {
