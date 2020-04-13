@@ -20,7 +20,6 @@ import {
   IsOptional,
   IsMobilePhone,
 } from 'class-validator';
-import config from '@app/config';
 import { CryptUtil } from '@app/util';
 import Puppy from './Puppy';
 
@@ -144,12 +143,8 @@ export default class User {
   })
   password!: string;
 
-  @Column({ name: 'avatar', length: 128 })
-  @IsString({ groups: [UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
-  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [UserValidationGroup.UPDATE] })
-  @Length(1, 128, { groups: [UserValidationGroup.UPDATE] })
+  @Column({ name: 'avatar', length: 256 })
+  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   avatar!: string;
 
   @OneToMany(() => Puppy, (puppy) => puppy.user)
@@ -169,7 +164,22 @@ export default class User {
 
   @BeforeInsert()
   defaultAvatar() {
-    this.avatar =
-      config.RESOURCE.IMAGE.USER.CONTEXT_PATH + this.gender + config.RESOURCE.IMAGE.USER.EXT;
+    switch (this.gender) {
+      case UserGender.MALE: {
+        this.avatar =
+          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/male.png';
+        break;
+      }
+      case UserGender.FEMALE: {
+        this.avatar =
+          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/female.png';
+        break;
+      }
+      default: {
+        this.avatar =
+          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/unknown.png';
+        break;
+      }
+    }
   }
 }

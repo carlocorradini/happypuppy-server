@@ -28,7 +28,7 @@ router.post(
 );
 
 const upload = multer({ storage: multer.memoryStorage() });
-router.post('/avatar', upload.single('avatar'), UserController.uploadAvatar);
+router.post('/avatar', upload.single('avatar'), UserController.updateAvatar);
 
 router.patch(
   '',

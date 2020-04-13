@@ -11,7 +11,7 @@ export interface Response {
   status_code: number;
   // eslint-disable-next-line camelcase
   status_code_name: string;
-  data: any;
+  data: object;
 }
 
 export default class ResponseHelper {
@@ -27,12 +27,14 @@ export default class ResponseHelper {
         is_success: httpStatusCode.isSuccess(),
         status_code: httpStatusCode.code,
         status_code_name: httpStatusCode.name,
-        ...(data !== undefined && {
-          data: {
-            ...(httpStatusCode.isSuccess() ? data : { errors: data }),
-          },
-        }),
+        data: this.data(httpStatusCode, data),
       })
       .end();
+  }
+
+  private static data(httpStatusCode: HttpStatusCode, data: any): object | undefined {
+    if (data === undefined || httpStatusCode.isSuccess()) return data;
+
+    return { errors: Array.isArray(data) ? data : [data] };
   }
 }

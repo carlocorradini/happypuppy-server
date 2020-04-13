@@ -12,7 +12,6 @@ import {
   BeforeInsert,
 } from 'typeorm';
 import { IsString, Length, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator';
-import config from '@app/config';
 import User from './User';
 
 export enum PuppyValidationGroup {
@@ -36,12 +35,8 @@ export default class Puppy {
   @Length(1, 64, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   name!: string;
 
-  @Column({ name: 'avatar', length: 128 })
-  @IsString({ groups: [PuppyValidationGroup.UPDATE] })
-  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
-  @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsNotEmpty({ groups: [PuppyValidationGroup.UPDATE] })
-  @Length(1, 128, { groups: [PuppyValidationGroup.UPDATE] })
+  @Column({ name: 'avatar', length: 256 })
+  @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   avatar!: string;
 
   @ManyToOne(() => User, (user) => user.puppies, { nullable: false, onDelete: 'CASCADE' })
@@ -60,9 +55,7 @@ export default class Puppy {
 
   @BeforeInsert()
   defaultAvatar() {
-    this.avatar =
-      config.RESOURCE.IMAGE.PUPPY.CONTEXT_PATH +
-      new Date().toISOString() +
-      config.RESOURCE.IMAGE.PUPPY.EXT;
+    // TODO tel sai cosa cambiare
+    this.avatar = '????';
   }
 }

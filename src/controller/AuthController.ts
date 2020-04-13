@@ -14,7 +14,7 @@ import {
   EntityNotFoundError,
   DataMismatchError,
 } from '@app/common/error';
-import { ResponseHelper, HttpStatusCode } from '@app/helper';
+import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 
 export default class AuthController {
   public static signIn(req: Request, res: Response): void {
@@ -25,8 +25,10 @@ export default class AuthController {
 
     getCustomRepository(UserRepository)
       .signInOrFail(user)
-      .then((token) => {
-        logger.info(`Authentication with credentials succeeded for User ${user.id}`);
+      .then(async (token) => {
+        logger.info(
+          `Authentication with credentials succeeded for User ${(await JWTHelper.verify(token)).id}`
+        );
 
         ResponseHelper.send(res, HttpStatusCode.OK, { token });
       })
@@ -44,12 +46,12 @@ export default class AuthController {
     getCustomRepository(UserVerificationRepository)
       .verifyOrFail(userVerification)
       .then((token) => {
-        logger.info(`Verification succeeded for User with id ${userVerification.user_id}`);
+        logger.info(`Verification succeeded for User ${userVerification.user_id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK, { token });
       })
       .catch((ex) => {
-        logger.warn(`Failed to verify User due to ${ex.message}`);
+        logger.warn(`Failed to verify User ${userVerification.user_id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);

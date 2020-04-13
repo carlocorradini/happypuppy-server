@@ -52,18 +52,6 @@ export interface Configuration {
       EXPIRES_IN: string;
     };
   };
-  RESOURCE: {
-    IMAGE: {
-      USER: {
-        CONTEXT_PATH: string;
-        EXT: string;
-      };
-      PUPPY: {
-        CONTEXT_PATH: string;
-        EXT: string;
-      };
-    };
-  };
 }
 
 const cleanConfig = envalid.cleanEnv(
@@ -148,18 +136,6 @@ const config: Configuration = {
     JWT: {
       SECRET: cleanConfig.SECURITY_JWT_SECRET,
       EXPIRES_IN: cleanConfig.SECURITY_JWT_EXPIRES_IN,
-    },
-  },
-  RESOURCE: {
-    IMAGE: {
-      USER: {
-        CONTEXT_PATH: '/private/image/user/',
-        EXT: '.png',
-      },
-      PUPPY: {
-        CONTEXT_PATH: '/private/image/puppy/',
-        EXT: '.png',
-      },
     },
   },
 };

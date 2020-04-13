@@ -12,4 +12,16 @@ export default class JWTHelper {
       })
     );
   }
+
+  public static verify(token: string): Promise<types.JWT.Payload> {
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, config.SECURITY.JWT.SECRET, (err, decoded) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(decoded as types.JWT.Payload);
+        }
+      });
+    });
+  }
 }

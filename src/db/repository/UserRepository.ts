@@ -25,6 +25,7 @@ import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import { JWTHelper } from '@app/helper';
+import ImageService, { ImageType } from '@app/service/ImageService';
 import UserVerificationRepository from './UserVerificationRepository';
 
 @EntityRepository(User)
@@ -94,6 +95,25 @@ export default class UserRepository extends AbstractRepository<User> {
       const userToUpdate: User = await em.findOneOrFail(User, user.id);
       await em.merge(User, userToUpdate, user);
       return UserRepository.updateUnique(userToUpdate, em);
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
+  }
+
+  public async updateAvataOrFail(
+    user: User,
+    avatar: Express.Multer.File,
+    entityManager?: EntityManager
+  ): Promise<User> {
+    const callback = async (em: EntityManager) => {
+      const avatarResult = await ImageService.upload(avatar, {
+        type: ImageType.AVATAR,
+        folder: 'user/avatar',
+      });
+      // eslint-disable-next-line no-param-reassign
+      user.avatar = avatarResult.secure_url;
+      return this.updateOrFail(user, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
