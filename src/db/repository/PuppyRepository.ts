@@ -17,19 +17,25 @@ import { DuplicateEntityError } from '@app/common/error';
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import { EntityUtil } from '@app/util';
 import ImageService, { ImageType } from '@app/service/ImageService';
+import PersonalityRepository from './PersonalityRepository';
 
 @EntityRepository(Puppy)
 export default class PuppyRepository extends AbstractRepository<Puppy> {
-  public async saveOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
-    const callback = (em: EntityManager) => {
+  public saveOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
+    const callback = async (em: EntityManager) => {
+      // eslint-disable-next-line no-param-reassign
+      puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities);
       return PuppyRepository.saveUnique(puppy, em);
     };
     if (entityManager === undefined) return this.manager.transaction(callback);
     return callback(entityManager);
   }
 
-  public async updateOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
+  public updateOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
+      if (puppy.personalities)
+        // eslint-disable-next-line no-param-reassign
+        puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities);
       const puppyToUpdate: Puppy = await em.findOneOrFail(Puppy, puppy.id, {
         where: { user: puppy.user },
       });
@@ -41,7 +47,7 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
     return callback(entityManager);
   }
 
-  public async updateAvataOrFail(
+  public updateAvataOrFail(
     puppy: Puppy,
     avatar: Express.Multer.File,
     entityManager?: EntityManager
@@ -60,7 +66,7 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
     return callback(entityManager);
   }
 
-  public async deleteOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<DeleteResult> {
+  public deleteOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
       await em.findOneOrFail(Puppy, puppy.id, {
         where: { user: puppy.user },
@@ -106,7 +112,7 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
     return entityManager.save(Puppy, puppy, saveOptions);
   }
 
-  private static async updateUnique(
+  private static updateUnique(
     puppy: Puppy,
     entityManager: EntityManager,
     saveOptions?: SaveOptions

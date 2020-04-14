@@ -15,7 +15,7 @@ import UserRepository from './UserRepository';
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
-  public async saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
+  public saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
     const callback = async (em: EntityManager) => {
       const userVerification = await em.save(
         UserVerification,
@@ -34,7 +34,7 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
     return callback(entityManager);
   }
 
-  public async verifyOrFail(
+  public verifyOrFail(
     userVerification: UserVerification,
     entityManager?: EntityManager
   ): Promise<string> {

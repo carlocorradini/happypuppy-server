@@ -79,7 +79,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return Promise.resolve(user);
   }
 
-  public async saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
+  public saveOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
       const newUser: User = await UserRepository.saveUnique(user, em);
       await em.getCustomRepository(UserVerificationRepository).saveOrFail(newUser, em);
@@ -90,7 +90,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  public async updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
+  public updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
     const callback = async (em: EntityManager) => {
       const userToUpdate: User = await em.findOneOrFail(User, user.id);
       await em.merge(User, userToUpdate, user);
@@ -101,7 +101,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  public async updateAvataOrFail(
+  public updateAvataOrFail(
     user: User,
     avatar: Express.Multer.File,
     entityManager?: EntityManager
@@ -120,7 +120,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return callback(entityManager);
   }
 
-  public async deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
+  public deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
       await em.findOneOrFail(User, user.id);
       return em.delete(User, user.id);
@@ -164,7 +164,7 @@ export default class UserRepository extends AbstractRepository<User> {
     return entityManager.save(User, user, saveOptions);
   }
 
-  private static async updateUnique(
+  private static updateUnique(
     user: User,
     entityManager: EntityManager,
     saveOptions?: SaveOptions

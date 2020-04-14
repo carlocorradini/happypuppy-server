@@ -13,7 +13,7 @@ export default class PuppyController {
     const { id } = req.params;
 
     getRepository(Puppy)
-      .findOneOrFail(id)
+      .findOneOrFail(id, { loadRelationIds: true })
       .then((puppy) => {
         logger.info(`Found Puppy ${puppy.id}`);
 

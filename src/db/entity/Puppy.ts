@@ -8,11 +8,28 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  RelationId,
   BeforeInsert,
+  ManyToMany,
+  JoinTable,
+  Check,
 } from 'typeorm';
-import { IsString, Length, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsEmpty,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsPositive,
+  Min,
+  Max,
+  IsISO8601,
+  IsArray,
+  ArrayUnique,
+} from 'class-validator';
 import User from './User';
+import Personality from './Personality';
 
 export enum PuppyValidationGroup {
   // eslint-disable-next-line no-unused-vars
@@ -21,7 +38,25 @@ export enum PuppyValidationGroup {
   UPDATE = 'update',
 }
 
+export enum PuppyGender {
+  // eslint-disable-next-line no-unused-vars
+  MALE = 'male',
+  // eslint-disable-next-line no-unused-vars
+  FEMALE = 'female',
+}
+
+/**
+ * Mininum puppy weight in grams
+ */
+export const PUPPY_MIN_WEIGHT: number = 1;
+/**
+ * Maximum puppy weight in grams
+ * Weight of a Blue Whale
+ */
+export const PUPPY_MAX_WEIGHT: number = 190000000;
+
 @Entity('puppy')
+@Check(`weight >= ${PUPPY_MIN_WEIGHT} AND weight <= ${PUPPY_MAX_WEIGHT}`)
 export default class Puppy {
   @PrimaryGeneratedColumn('uuid', { name: 'id' })
   @Index()
@@ -35,6 +70,39 @@ export default class Puppy {
   @Length(1, 64, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   name!: string;
 
+  @Column({
+    name: 'gender',
+    type: 'enum',
+    enum: PuppyGender,
+    update: false,
+  })
+  @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  gender!: PuppyGender;
+
+  @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
+  @IsISO8601(
+    { strict: true },
+    { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] }
+  )
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  date_of_birth!: Date;
+
+  @Column({ name: 'weight', type: 'integer', nullable: true, default: undefined })
+  @IsInt({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsPositive({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @Min(PUPPY_MIN_WEIGHT, {
+    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+  })
+  @Max(PUPPY_MAX_WEIGHT, {
+    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+  })
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  weight!: number;
+
   @Column({ name: 'avatar', length: 256 })
   @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   avatar!: string;
@@ -43,9 +111,25 @@ export default class Puppy {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @RelationId((puppy: Puppy) => puppy.user)
-  @IsEmpty({ always: true })
-  user_id!: string;
+  @ManyToMany(() => Personality)
+  @JoinTable({
+    name: 'puppy_personality',
+    joinColumn: {
+      name: 'puppy_id',
+    },
+    inverseJoinColumn: {
+      name: 'personality_id',
+    },
+  })
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsArray({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @ArrayUnique({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsInt({ each: true, groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsPositive({
+    each: true,
+    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+  })
+  personalities!: Personality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;
