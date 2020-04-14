@@ -16,6 +16,7 @@ import { DuplicateEntityError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import { EntityUtil } from '@app/util';
+import ImageService, { ImageType } from '@app/service/ImageService';
 
 @EntityRepository(Puppy)
 export default class PuppyRepository extends AbstractRepository<Puppy> {
@@ -34,6 +35,25 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
       });
       await em.merge(Puppy, puppyToUpdate, puppy);
       return PuppyRepository.updateUnique(puppyToUpdate, em);
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
+  }
+
+  public async updateAvataOrFail(
+    puppy: Puppy,
+    avatar: Express.Multer.File,
+    entityManager?: EntityManager
+  ): Promise<Puppy> {
+    const callback = async (em: EntityManager) => {
+      const avatarResult = await ImageService.upload(avatar, {
+        type: ImageType.AVATAR,
+        folder: 'puppy/avatar',
+      });
+      // eslint-disable-next-line no-param-reassign
+      puppy.avatar = avatarResult.secure_url;
+      return this.updateOrFail(puppy, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);

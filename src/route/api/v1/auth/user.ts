@@ -26,17 +26,17 @@ router.post(
   UserController.register
 );
 
-router.post(
-  '/avatar',
-  FileMiddleware.memoryLoader.single('image'),
-  FileMiddleware.checkSingle('image'),
-  UserController.updateAvatar
-);
-
 router.patch(
   '',
   ValidatorMiddleware.validateClass(User, UserValidationGroup.UPDATE),
   UserController.update
+);
+
+router.patch(
+  '/avatar',
+  FileMiddleware.memoryLoader.single('image'),
+  ValidatorMiddleware.validateFileSingle('image'),
+  UserController.updateAvatar
 );
 
 router.delete('', UserController.delete);

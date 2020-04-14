@@ -5,6 +5,7 @@ import { ValidationChain, validationResult } from 'express-validator';
 // eslint-disable-next-line no-unused-vars
 import { transformAndValidate, ClassType } from 'class-transformer-validator';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
+import { EmptyFileError } from '@app/common/error';
 
 export default class ValidatorMiddleware {
   public static validateChain(validations: ValidationChain[]) {
@@ -41,6 +42,13 @@ export default class ValidatorMiddleware {
         .catch((ex) => {
           ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, ex);
         });
+    };
+  }
+
+  public static validateFileSingle(fieldName: string) {
+    return (req: Request, _res: Response, next: NextFunction) => {
+      if (req.file) next();
+      else next(new EmptyFileError(`No file found in field named ${fieldName}`, fieldName));
     };
   }
 

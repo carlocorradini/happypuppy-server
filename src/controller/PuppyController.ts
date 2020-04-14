@@ -69,6 +69,26 @@ export default class PuppyController {
       });
   }
 
+  public static updateAvatar(req: Request, res: Response): void {
+    const puppy: Puppy = getManager().create(Puppy, {
+      id: req.params.id,
+      user: getManager().create(User, { id: req.user?.id ? req.user.id : '' }),
+    });
+
+    getCustomRepository(PuppyRepository)
+      .updateAvataOrFail(puppy, req.file)
+      .then((upPuppy) => {
+        logger.info(`Changed avatar for Puppy ${upPuppy.id} to ${upPuppy.avatar}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, { avatar: upPuppy.avatar });
+      })
+      .catch((ex) => {
+        logger.error(`Failed to change avatar for Puppy ${puppy.id} due to ${ex.message}`);
+
+        ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
   public static delete(req: Request, res: Response): void {
     const puppy: Puppy = getManager().create(Puppy, {
       id: req.params.id,

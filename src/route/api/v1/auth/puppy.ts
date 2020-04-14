@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
-import { ValidatorMiddleware } from '@app/middleware';
-import { PuppyController } from '@app/controller';
 import Puppy, { PuppyValidationGroup } from '@app/db/entity/Puppy';
+import { PuppyController } from '@app/controller';
+import { ValidatorMiddleware, FileMiddleware } from '@app/middleware';
 
 const router = Router();
 
@@ -39,6 +39,22 @@ router.patch(
   ),
   ValidatorMiddleware.validateClass(Puppy, PuppyValidationGroup.UPDATE),
   PuppyController.update
+);
+
+router.patch(
+  '/:id/avatar',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid Puppy id',
+      },
+    })
+  ),
+  FileMiddleware.memoryLoader.single('image'),
+  ValidatorMiddleware.validateFileSingle('image'),
+  PuppyController.updateAvatar
 );
 
 router.delete(
