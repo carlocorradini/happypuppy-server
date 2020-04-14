@@ -17,7 +17,6 @@ import {
   IsString,
   Length,
   IsEmpty,
-  IsNotEmpty,
   IsOptional,
   IsEnum,
   IsInt,
@@ -60,14 +59,13 @@ export const PUPPY_MAX_WEIGHT: number = 190000000;
 export default class Puppy {
   @PrimaryGeneratedColumn('uuid', { name: 'id' })
   @Index()
-  @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsEmpty({ always: true })
   id!: string;
 
   @Column({ name: 'name', length: 64 })
   @IsString({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @Length(1, 64, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
   name!: string;
 
   @Column({
@@ -78,7 +76,6 @@ export default class Puppy {
   })
   @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   gender!: PuppyGender;
 
   @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
@@ -87,7 +84,6 @@ export default class Puppy {
     { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] }
   )
   @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   date_of_birth!: Date;
 
   @Column({ name: 'weight', type: 'integer', nullable: true, default: undefined })
@@ -100,15 +96,15 @@ export default class Puppy {
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
   @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @IsNotEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   weight!: number;
 
   @Column({ name: 'avatar', length: 256 })
-  @IsEmpty({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsEmpty({ always: true })
   avatar!: string;
 
   @ManyToOne(() => User, (user) => user.puppies, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
+  @IsEmpty({ always: true })
   user!: User;
 
   @ManyToMany(() => Personality)
@@ -121,7 +117,6 @@ export default class Puppy {
       name: 'personality_id',
     },
   })
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @IsArray({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @ArrayUnique({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @IsInt({ each: true, groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
@@ -129,6 +124,7 @@ export default class Puppy {
     each: true,
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   personalities!: Personality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
