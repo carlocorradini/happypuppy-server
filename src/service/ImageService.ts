@@ -82,7 +82,7 @@ export default class ImageService {
   ): cloudinary.UploadApiOptions {
     // Construct correct folder options object
     const folder: cloudinary.UploadApiOptions = {
-      folder: (this.options.folder as string) + options.folder,
+      folder: (this.options.folder as string) + (options.folder as string),
     };
 
     // Delete possibly forced options
@@ -93,10 +93,9 @@ export default class ImageService {
 
     // Add correct folder to upload options
     // eslint-disable-next-line no-param-reassign
-    options.uploadOptions = options?.uploadOptions
-      ? Object.assign(options.uploadOptions, folder)
-      : folder;
+    options.uploadOptions =
+      options.uploadOptions !== undefined ? Object.assign(options.uploadOptions, folder) : folder;
 
-    return Object.assign(this.options, ImageTypeOptions[options.type], options.uploadOptions);
+    return { ...this.options, ...ImageTypeOptions[options.type], ...options.uploadOptions };
   }
 }
