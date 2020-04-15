@@ -14,15 +14,15 @@ router.use(
     secret: config.SECURITY.JWT.SECRET,
   }).unless({
     path: [
-      {
-        url: '/api/v1/auth/verify',
-        methods: ['POST'],
-      },
-      {
-        url: '/api/v1/auth/signin',
-        methods: ['POST'],
-      },
       { url: '/api/v1/auth/user', methods: ['POST'] },
+      {
+        url: '/api/v1/auth/user/verify',
+        methods: ['POST'],
+      },
+      {
+        url: '/api/v1/auth/user/signin',
+        methods: ['POST'],
+      },
     ],
   }),
   auth

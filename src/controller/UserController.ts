@@ -3,9 +3,18 @@ import { Request, Response } from 'express';
 import { getRepository, getCustomRepository } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
+// eslint-disable-next-line no-unused-vars
+import UserVerification from '@app/db/entity/UserVerification';
 import UserRepository from '@app/db/repository/UserRepository';
-import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
-import { ResponseHelper, HttpStatusCode } from '@app/helper';
+import UserVerificationRepository from '@app/db/repository/UserVerificationRepository';
+import {
+  DuplicateEntityError,
+  UserNotVerifiedError,
+  UserAlreadyVerifiedError,
+  EntityNotFoundError,
+  DataMismatchError,
+} from '@app/common/error';
+import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 
 export default class UserController {
   public static find(req: Request, res: Response): void {
@@ -43,6 +52,52 @@ export default class UserController {
         if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static verify(req: Request, res: Response): void {
+    const userVerification: UserVerification = req.app.locals.UserVerification;
+
+    getCustomRepository(UserVerificationRepository)
+      .verifyOrFail(userVerification)
+      .then((token) => {
+        logger.info(`Verification succeeded for User ${userVerification.user_id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, { token });
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to verify User ${userVerification.user_id} due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
+          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else if (ex instanceof UserAlreadyVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
+        else if (ex instanceof DataMismatchError) {
+          ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
+        } else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static signIn(req: Request, res: Response): void {
+    const user: User = getRepository(User).create({
+      username: req.body.username,
+      password: req.body.password,
+    });
+
+    getCustomRepository(UserRepository)
+      .signInOrFail(user)
+      .then(async (token) => {
+        logger.info(
+          `Authentication with credentials succeeded for User ${(await JWTHelper.verify(token)).id}`
+        );
+
+        ResponseHelper.send(res, HttpStatusCode.OK, { token });
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to authenticate User with credentials due to ${ex.message}`);
+
+        if (ex instanceof UserNotVerifiedError) ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
+        else ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
       });
   }
 
