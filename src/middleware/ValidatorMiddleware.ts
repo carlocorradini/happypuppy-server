@@ -4,6 +4,7 @@ import { Response, Request, NextFunction } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
 // eslint-disable-next-line no-unused-vars
 import { transformAndValidate, ClassType } from 'class-transformer-validator';
+import logger from '@app/logger';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 import { EmptyFileError } from '@app/common/error';
 
@@ -14,7 +15,10 @@ export default class ValidatorMiddleware {
       const errors = validationResult(req);
 
       if (errors.isEmpty()) next();
-      else ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors.array());
+      else {
+        logger.warn(`Validation chain failed due to ${JSON.stringify(errors.array())}`);
+        ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, errors.array());
+      }
     };
   }
 
@@ -33,13 +37,12 @@ export default class ValidatorMiddleware {
           },
         },
       })
-        .then((_class) => {
-          return this.addClassToLocals(req, _class);
-        })
+        .then((_class) => this.addClassToLocals(req, _class))
         .then(() => {
           next();
         })
         .catch((ex) => {
+          logger.warn(`Validation failed for class ${classType.name} due to ${JSON.stringify(ex)}`);
           ResponseHelper.send(res, HttpStatusCode.UNPROCESSABLE_ENTITY, ex);
         });
     };
