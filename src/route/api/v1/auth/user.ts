@@ -26,7 +26,20 @@ router.post(
   ValidatorMiddleware.validateClass(User, UserValidationGroup.REGISTRATION),
   UserController.register
 );
-router.post('/verify', ValidatorMiddleware.validateClass(UserVerification), UserController.verify);
+router.post(
+  '/verify/:id',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid User id',
+      },
+    })
+  ),
+  ValidatorMiddleware.validateClass(UserVerification),
+  UserController.verify
+);
 router.post(
   '/signin',
   ValidatorMiddleware.validateClass(User, UserValidationGroup.SIGN_IN),

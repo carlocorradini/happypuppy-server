@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, RelationId } from 'typeorm';
-import { IsUUID, IsNumberString, Length, IsEmpty } from 'class-validator';
+import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn } from 'typeorm';
+import { IsNumberString, Length, IsEmpty } from 'class-validator';
 import config from '@app/config';
 import User from './User';
 
@@ -10,10 +10,6 @@ export default class UserVerification {
   @JoinColumn({ name: 'user_id' })
   @IsEmpty({ always: true })
   user!: User;
-
-  @RelationId((userVerification: UserVerification) => userVerification.user)
-  @IsUUID()
-  user_id!: string;
 
   @Column({ name: 'otp_email', length: config.SECURITY.OTP.EMAIL.DIGITS })
   @IsNumberString()

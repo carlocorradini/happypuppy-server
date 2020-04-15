@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getRepository, getCustomRepository } from 'typeorm';
+import { getCustomRepository, getManager } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 // eslint-disable-next-line no-unused-vars
@@ -57,16 +57,17 @@ export default class UserController {
 
   public static verify(req: Request, res: Response): void {
     const userVerification: UserVerification = req.app.locals.UserVerification;
+    userVerification.user = getManager().create(User, { id: req.params.id });
 
     getCustomRepository(UserVerificationRepository)
       .verifyOrFail(userVerification)
       .then((token) => {
-        logger.info(`Verification succeeded for User ${userVerification.user_id}`);
+        logger.info(`Verification succeeded for User ${userVerification.user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK, { token });
       })
       .catch((ex) => {
-        logger.warn(`Failed to verify User ${userVerification.user_id} due to ${ex.message}`);
+        logger.warn(`Failed to verify User ${userVerification.user.id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
@@ -79,7 +80,7 @@ export default class UserController {
   }
 
   public static signIn(req: Request, res: Response): void {
-    const user: User = getRepository(User).create({
+    const user: User = getManager().create(User, {
       username: req.body.username,
       password: req.body.password,
     });
@@ -125,7 +126,7 @@ export default class UserController {
     const id: string = req.user?.id ? req.user.id : '';
 
     getCustomRepository(UserRepository)
-      .updateAvataOrFail(getRepository(User).create({ id }), req.file)
+      .updateAvataOrFail(getManager().create(User, { id }), req.file)
       .then((user) => {
         logger.info(`Changed avatar for User ${user.id} to ${user.avatar}`);
 
@@ -142,7 +143,7 @@ export default class UserController {
     const id: string = req.user?.id ? req.user.id : '';
 
     getCustomRepository(UserRepository)
-      .deleteOrFail(getRepository(User).create({ id }))
+      .deleteOrFail(getManager().create(User, { id }))
       .then(() => {
         logger.info(`Deleted User ${id}`);
 

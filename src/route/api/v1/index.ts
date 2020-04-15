@@ -16,7 +16,7 @@ router.use(
     path: [
       { url: '/api/v1/auth/user', methods: ['POST'] },
       {
-        url: '/api/v1/auth/user/verify',
+        url: /\/api\/v1\/auth\/user\/verify\/*/,
         methods: ['POST'],
       },
       {
