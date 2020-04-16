@@ -7,6 +7,8 @@ import helmet from 'helmet';
 import favicon from 'serve-favicon';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import exphbs from 'express-handlebars';
+import hbshelpers from 'handlebars-helpers';
 import logger from '@app/logger';
 import routes from '@app/route';
 import { NotFoundMiddleware, ErrorMiddleware } from '@app/middleware';
@@ -33,12 +35,23 @@ export default class Server {
       .options('*', cors())
       .use(cors())
       .enable('trust proxy')
+      .engine(
+        '.hbs',
+        exphbs.create({
+          extname: '.hbs',
+          layoutsDir: path.join(__dirname, '../view/site/layout'),
+          partialsDir: path.join(__dirname, '../view/site/partial'),
+          helpers: hbshelpers(),
+        }).engine
+      )
+      .set('view engine', '.hbs')
+      .set('views', path.join(__dirname, '../view/site'))
       .use(compression())
       .use(helmet())
       .use(bodyParser.json())
       .use(bodyParser.urlencoded({ extended: true }))
       .use(favicon(path.join(__dirname, '../public', 'favicon.ico')))
-      .use('/public', express.static(path.join(__dirname, '../public')))
+      .use('/', express.static(path.join(__dirname, '../public')))
       .use('/', routes)
       .use(NotFoundMiddleware.handle)
       .use(ErrorMiddleware.handle);

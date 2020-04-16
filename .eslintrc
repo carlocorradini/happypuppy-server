@@ -2,7 +2,11 @@
   "root": true,
   "env": {
     "node": true,
-    "jest": true
+    "jest": true,
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "jquery": true
   },
   "extends": [
     "airbnb",

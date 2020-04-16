@@ -14,8 +14,11 @@ import {
   UserAlreadyVerifiedError,
   EntityNotFoundError,
   DataMismatchError,
+  InvalidTokenException,
 } from '@app/common/error';
 import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
+// eslint-disable-next-line no-unused-vars
+import UserPasswordReset from '@app/db/entity/UserPasswordReset';
 
 export default class UserController {
   public static find(req: Request, res: Response): void {
@@ -103,22 +106,43 @@ export default class UserController {
       });
   }
 
-  public static resetPassword(req: Request, res: Response): void {
+  public static passwordResetRequest(req: Request, res: Response): void {
     const { email } = req.params;
 
     getManager()
       .findOneOrFail(User, { where: { email }, select: ['id', 'username', 'email'] })
-      .then((user) => getCustomRepository(UserPasswordResetRepository).saveOrFail(user))
-      .then((passwordReset) => {
-        logger.info(`Request reset password sended for User ${passwordReset.user.id}`);
+      .then((user) => getCustomRepository(UserPasswordResetRepository).request(user))
+      .then((userPasswordReset) => {
+        logger.info(`Request reset password sended for User ${userPasswordReset.user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK);
       })
       .catch((ex) => {
-        logger.warn(`Failed reset password request for User ${email} due to ${ex.message}`);
+        logger.warn(`Failed sending reset password request for User ${email} due to ${ex.message}`);
 
         // Return 200 if NOT FOUND due to security risks
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.OK);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static passwordReset(req: Request, res: Response): void {
+    const userPasswordReset: UserPasswordReset = req.app.locals.UserPasswordReset;
+
+    getCustomRepository(UserPasswordResetRepository)
+      .change(userPasswordReset)
+      .then((user) => {
+        logger.info(`Updated User ${user.id} password`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(
+          `Failed to update User ${userPasswordReset.token} password due to ${ex.message}`
+        );
+
+        if (ex.name === 'EntityNotFound' || ex instanceof InvalidTokenException)
+          ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }

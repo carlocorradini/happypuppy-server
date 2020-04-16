@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
 import User, { UserValidationGroup } from '@app/db/entity/User';
+import UserPasswordReset from '@app/db/entity/UserPasswordReset';
 import UserVerification from '@app/db/entity/UserVerification';
 import { UserController } from '@app/controller';
 import { ValidatorMiddleware, FileMiddleware } from '@app/middleware';
@@ -46,7 +47,7 @@ router.post(
   UserController.signIn
 );
 router.post(
-  '/reset_password/:email',
+  '/password_reset/:email',
   ValidatorMiddleware.validateChain(
     checkSchema({
       email: {
@@ -56,7 +57,12 @@ router.post(
       },
     })
   ),
-  UserController.resetPassword
+  UserController.passwordResetRequest
+);
+router.post(
+  '/password_reset',
+  ValidatorMiddleware.validateClass(UserPasswordReset),
+  UserController.passwordReset
 );
 
 router.patch(

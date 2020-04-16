@@ -24,7 +24,7 @@ router.use(
         methods: ['POST'],
       },
       {
-        url: /\/api\/v1\/auth\/user\/reset_password\/*/,
+        url: /\/api\/v1\/auth\/user\/password_reset\/*/,
         methods: ['POST'],
       },
     ],
