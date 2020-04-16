@@ -50,7 +50,7 @@ export default class EmailService {
     return new Promise((resolve, reject) => {
       this.transport.sendMail(mailOptions, (err, info) => {
         if (err) {
-          logger.error(`Error sending email due to ${JSON.stringify(err)}`);
+          logger.error(`Error sending email due to ${err.message}`);
           reject(err);
         } else {
           logger.info(`Sended email ${JSON.stringify(info)}`);

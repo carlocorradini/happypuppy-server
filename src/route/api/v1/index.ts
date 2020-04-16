@@ -23,6 +23,10 @@ router.use(
         url: '/api/v1/auth/user/signin',
         methods: ['POST'],
       },
+      {
+        url: /\/api\/v1\/auth\/user\/reset_password\/*/,
+        methods: ['POST'],
+      },
     ],
   }),
   auth

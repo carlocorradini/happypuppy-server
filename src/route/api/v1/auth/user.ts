@@ -45,6 +45,19 @@ router.post(
   ValidatorMiddleware.validateClass(User, UserValidationGroup.SIGN_IN),
   UserController.signIn
 );
+router.post(
+  '/reset_password/:email',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      email: {
+        in: ['params'],
+        isEmail: true,
+        errorMessage: 'Invalid email',
+      },
+    })
+  ),
+  UserController.resetPassword
+);
 
 router.patch(
   '',

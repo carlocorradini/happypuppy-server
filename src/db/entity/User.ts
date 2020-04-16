@@ -20,6 +20,7 @@ import {
   IsMobilePhone,
 } from 'class-validator';
 import { CryptUtil } from '@app/util';
+import { NoWhitespace } from '@app/common/validator';
 import Puppy from './Puppy';
 
 export enum UserValidationGroup {
@@ -95,6 +96,7 @@ export default class User {
   @Column({ name: 'username', length: 128, unique: true, update: false })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @NoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   username!: string;
 

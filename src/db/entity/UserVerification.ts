@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { IsNumberString, Length, IsEmpty } from 'class-validator';
 import config from '@app/config';
 import User from './User';
@@ -23,4 +23,7 @@ export default class UserVerification {
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', select: false })
+  updated_at!: Date;
 }

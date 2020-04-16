@@ -10,14 +10,15 @@ import {
   DataMismatchError,
   UserAlreadyVerifiedError,
 } from '@app/common/error';
-import { JWTHelper, OTPHelper } from '@app/helper';
+import { JWTHelper } from '@app/helper';
+import { EmailService, PhoneService } from '@app/service';
 import UserRepository from './UserRepository';
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
   public saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
     const callback = async (em: EntityManager) => {
-      const userVerification = await em.save(
+      const userVerification: UserVerification = await em.save(
         UserVerification,
         em.create(UserVerification, {
           user,
@@ -25,8 +26,26 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
           otp_phone: await OTPUtil.digits(config.SECURITY.OTP.PHONE.DIGITS),
         })
       );
+      // TODO Change from
+      await EmailService.send({
+        from: '"Happy Puppy" <otp@happypuppy.com>',
+        to: user.email,
+        subject: 'Happy Puppy OTP code',
+        // TODO Remove Typescript ignore
+        // @ts-ignore
+        template: 'otp',
+        context: {
+          username: user.username,
+          otp_code: userVerification.otp_email,
+        },
+      });
 
-      await OTPHelper.send(user, userVerification);
+      await PhoneService.send({
+        from: config.SERVICE.PHONE.NUMBER,
+        to: user.phone,
+        body: `${user.username} OTP code: ${userVerification.otp_phone}`,
+      });
+
       return Promise.resolve(userVerification);
     };
 

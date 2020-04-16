@@ -44,6 +44,11 @@ export interface Configuration {
         DIGITS: number;
       };
     };
+    TOKEN: {
+      PASSWORD: {
+        LENGTH: number;
+      };
+    };
     BCRYPT: {
       SALT_ROUNS: number;
     };
@@ -129,6 +134,9 @@ const config: Configuration = {
     OTP: {
       EMAIL: { DIGITS: 5 },
       PHONE: { DIGITS: 5 },
+    },
+    TOKEN: {
+      PASSWORD: { LENGTH: 32 },
     },
     BCRYPT: {
       SALT_ROUNS: cleanConfig.SECURITY_BCRYPT_SALT_ROUNDS,

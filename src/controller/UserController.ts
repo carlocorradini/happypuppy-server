@@ -7,6 +7,7 @@ import User from '@app/db/entity/User';
 import UserVerification from '@app/db/entity/UserVerification';
 import UserRepository from '@app/db/repository/UserRepository';
 import UserVerificationRepository from '@app/db/repository/UserVerificationRepository';
+import UserPasswordResetRepository from '@app/db/repository/UserPasswordResetRepository';
 import {
   DuplicateEntityError,
   UserNotVerifiedError,
@@ -99,6 +100,26 @@ export default class UserController {
 
         if (ex instanceof UserNotVerifiedError) ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
+      });
+  }
+
+  public static resetPassword(req: Request, res: Response): void {
+    const { email } = req.params;
+
+    getManager()
+      .findOneOrFail(User, { where: { email }, select: ['id', 'username', 'email'] })
+      .then((user) => getCustomRepository(UserPasswordResetRepository).saveOrFail(user))
+      .then((passwordReset) => {
+        logger.info(`Request reset password sended for User ${passwordReset.user.id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed reset password request for User ${email} due to ${ex.message}`);
+
+        // Return 200 if NOT FOUND due to security risks
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.OK);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
 
