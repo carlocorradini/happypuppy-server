@@ -130,10 +130,10 @@ router.get('', (_req: Request, res: Response) => {
 
 router.get('/password_reset/:token', async (req: Request, res: Response) => {
   const { token } = req.params;
-  let options: { user?: User; token?: string; consumed?: boolean } = {
+  let options: { user?: User; token?: string; used?: boolean } = {
     user: undefined,
     token: undefined,
-    consumed: undefined,
+    used: undefined,
   };
 
   const userPasswordReset = await getManager().findOne(UserPasswordReset, {
@@ -150,12 +150,12 @@ router.get('/password_reset/:token', async (req: Request, res: Response) => {
     options = {
       user: userPasswordReset.user,
       token: userPasswordReset.token,
-      consumed: false,
+      used: false,
     };
   } else if (userPasswordReset && userPasswordReset.used) {
     options = {
       user: userPasswordReset.user,
-      consumed: true,
+      used: true,
     };
   } else if (userPasswordReset) {
     options = {
