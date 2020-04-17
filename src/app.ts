@@ -26,6 +26,7 @@ createConnection(<ConnectionOptions>{
     logger.info(`Server running at ${addressInfo.address} on port ${addressInfo.port}`);
   })
   .catch((ex) => {
+    logger.error(JSON.stringify(ex));
     logger.error(ex.message);
     process.exit(1);
   });
