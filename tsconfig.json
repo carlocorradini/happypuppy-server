@@ -79,7 +79,7 @@
         "./node_modules",
         "./test",
         "./build",
-        "./src/**/*.spec.ts",
-        "./src/**/*.test.ts"
+        "**/*.spec.ts",
+        "**/*.test.ts"
     ]
 }
