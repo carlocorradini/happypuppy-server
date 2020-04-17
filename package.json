@@ -20,7 +20,7 @@
     "build": "npx ttsc --p ./tsconfig.json",
     "postbuild": "npx ts-node ./script/build.ts",
     "test": "jest",
-    "test:staged": "jest",
+    "test:staged": "jest --bail --findRelatedTests",
     "prestart": "npm install --only=prod",
     "start": "npx cross-env NODE_ENV=\"production\" node app.js",
     "prestart:prod": "cd build && npm install --only=prod",
