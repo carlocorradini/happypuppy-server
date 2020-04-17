@@ -2,12 +2,12 @@
   "name": "happy_puppy",
   "version": "1.0.0",
   "description": "Happy Puppy Server",
-  "homepage": "https://github.com/carlocorradini/HappyPuppyServer",
+  "homepage": "https://github.com/carlocorradini/happypuppy-server",
   "bugs": {
-    "url": "https://github.com/carlocorradini/HappyPuppyServer/issues",
+    "url": "https://github.com/carlocorradini/happypuppy-server/issues",
     "email": "carlo.corradini@studenti.unitn.it"
   },
-  "main": "./app.js",
+  "main": "./build/app.js",
   "private": true,
   "scripts": {
     "clean": "npx rimraf build/ && npx rimraf log/",
