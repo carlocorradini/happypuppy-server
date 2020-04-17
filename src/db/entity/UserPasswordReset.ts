@@ -16,9 +16,9 @@ export default class UserPasswordReset {
   @Length(config.SECURITY.TOKEN.PASSWORD.LENGTH, config.SECURITY.TOKEN.PASSWORD.LENGTH)
   token!: string;
 
-  @Column({ name: 'consumed' })
+  @Column({ name: 'used' })
   @IsEmpty({ always: true })
-  consumed!: boolean;
+  used!: boolean;
 
   @IsString()
   @Length(8, 64)

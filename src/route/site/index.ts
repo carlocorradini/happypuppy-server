@@ -9,7 +9,6 @@ import User from '@app/db/entity/User';
 
 const router = Router();
 
-// eslint-disable-next-line prettier/prettier
 const animals = [
   '🙈',
   '🙉',
@@ -144,16 +143,16 @@ router.get('/password_reset/:token', async (req: Request, res: Response) => {
 
   if (
     userPasswordReset &&
-    !userPasswordReset.consumed &&
+    !userPasswordReset.used &&
     moment(new Date()).diff(userPasswordReset.updated_at, 'minutes') <=
-      config.SECURITY.TOKEN.PASSWORD.EXPIRATION
+      config.SECURITY.TOKEN.PASSWORD.EXPIRES_IN
   ) {
     options = {
       user: userPasswordReset.user,
       token: userPasswordReset.token,
       consumed: false,
     };
-  } else if (userPasswordReset && userPasswordReset.consumed) {
+  } else if (userPasswordReset && userPasswordReset.used) {
     options = {
       user: userPasswordReset.user,
       consumed: true,

@@ -19,7 +19,7 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
         em.create(UserPasswordReset, {
           user,
           token: await OTPUtil.alphanumerical(config.SECURITY.TOKEN.PASSWORD.LENGTH),
-          consumed: false,
+          used: false,
         })
       );
       // TODO Change from
@@ -50,20 +50,20 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
   ): Promise<User> {
     const callback = async (em: EntityManager) => {
       const foundUserPasswordReset: UserPasswordReset = await em.findOneOrFail(UserPasswordReset, {
-        where: { token: userPasswordReset.token, consumed: false },
+        where: { token: userPasswordReset.token, used: false },
         relations: ['user'],
       });
 
       if (
-        foundUserPasswordReset.consumed ||
+        foundUserPasswordReset.used ||
         moment(new Date()).diff(foundUserPasswordReset.updated_at, 'minutes') >
-          config.SECURITY.TOKEN.PASSWORD.EXPIRATION
+          config.SECURITY.TOKEN.PASSWORD.EXPIRES_IN
       ) {
         throw new InvalidTokenException('User password reset token is expired');
       }
 
       foundUserPasswordReset.user.password = userPasswordReset.password;
-      foundUserPasswordReset.consumed = true;
+      foundUserPasswordReset.used = true;
 
       await em.save(UserPasswordReset, foundUserPasswordReset);
 

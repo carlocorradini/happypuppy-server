@@ -47,7 +47,7 @@ export interface Configuration {
     TOKEN: {
       PASSWORD: {
         LENGTH: number;
-        EXPIRATION: number;
+        EXPIRES_IN: number;
       };
     };
     BCRYPT: {
@@ -137,7 +137,7 @@ const config: Configuration = {
       PHONE: { DIGITS: 5 },
     },
     TOKEN: {
-      PASSWORD: { LENGTH: 32, EXPIRATION: 30 },
+      PASSWORD: { LENGTH: 32, EXPIRES_IN: 30 },
     },
     BCRYPT: {
       SALT_ROUNS: cleanConfig.SECURITY_BCRYPT_SALT_ROUNDS,

@@ -147,8 +147,20 @@ export default class User {
 
   @BeforeInsert()
   @BeforeUpdate()
+  capitalizeName() {
+    if (this.name) this.name = this.name.replace(/^\w/, (c) => c.toUpperCase());
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  capitalizeSurname() {
+    if (this.surname) this.surname = this.surname.replace(/^\w/, (c) => c.toUpperCase());
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
-    if (this.password !== undefined) this.password = await CryptUtil.hash(this.password);
+    if (this.password) this.password = await CryptUtil.hash(this.password);
   }
 
   @BeforeInsert()
