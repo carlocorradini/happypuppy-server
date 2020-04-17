@@ -1,1 +1,2 @@
-export { default } from './Server';
+// eslint-disable-next-line import/prefer-default-export
+export { default as Server } from './Server';
