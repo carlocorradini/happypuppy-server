@@ -18,6 +18,7 @@ import {
   IsEmpty,
   IsOptional,
   IsMobilePhone,
+  IsISO8601,
 } from 'class-validator';
 import { CryptUtil } from '@app/util';
 import { NoWhitespace } from '@app/common/validator';
@@ -70,16 +71,16 @@ export default class User {
   @IsEmpty({ always: true })
   verified!: boolean;
 
-  @Column({ name: 'name', length: 64 })
+  @Column({ name: 'name', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   name!: string;
 
-  @Column({ name: 'surname', length: 64 })
+  @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   surname!: string;
 
   @Column({
@@ -92,6 +93,14 @@ export default class User {
   @IsEnum(UserGender, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   gender!: UserGender;
+
+  @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
+  @IsISO8601(
+    { strict: true },
+    { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] }
+  )
+  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  date_of_birth!: Date;
 
   @Column({ name: 'username', length: 128, unique: true, update: false })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
