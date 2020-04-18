@@ -10,16 +10,12 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { getManager } from 'typeorm';
+import AnimalSpecie from '@app/db/entity/AnimalSpecie';
 
 @ValidatorConstraint({ async: true })
 export class IsValidAnimalSpecieConstraint implements ValidatorConstraintInterface {
-  validate(id: number) {
-    // TODO FindOne with object Entity
-    return getManager()
-      .findOne('AnimalSpecie', id)
-      .then((animalSpecie) => {
-        return animalSpecie !== undefined;
-      });
+  async validate(id: number) {
+    return (await getManager().findOne(AnimalSpecie, id)) !== undefined;
   }
 
   defaultMessage(args: ValidationArguments) {

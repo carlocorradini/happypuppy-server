@@ -6,6 +6,8 @@ import {
   // eslint-disable-next-line no-unused-vars
   ValidatorConstraintInterface,
   ValidatorConstraint,
+  // eslint-disable-next-line no-unused-vars
+  ValidationArguments,
 } from 'class-validator';
 
 @ValidatorConstraint()
@@ -14,8 +16,8 @@ export class HasNoWhitespaceConstraint implements ValidatorConstraintInterface {
     return typeof value === 'string' && !/\s/.test(value);
   }
 
-  defaultMessage() {
-    return `$property must not contains any whitespace`;
+  defaultMessage(args: ValidationArguments) {
+    return `${args.property} must not contains any whitespace`;
   }
 }
 
