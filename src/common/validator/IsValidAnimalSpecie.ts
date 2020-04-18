@@ -6,12 +6,14 @@ import {
   // eslint-disable-next-line no-unused-vars
   ValidationOptions,
   registerDecorator,
+  // eslint-disable-next-line no-unused-vars
+  ValidationArguments,
 } from 'class-validator';
 import { getManager } from 'typeorm';
 
 @ValidatorConstraint({ async: true })
 export class IsValidAnimalSpecieConstraint implements ValidatorConstraintInterface {
-  validate(id: any) {
+  validate(id: number) {
     // TODO FindOne with object Entity
     return getManager()
       .findOne('AnimalSpecie', id)
@@ -20,8 +22,8 @@ export class IsValidAnimalSpecieConstraint implements ValidatorConstraintInterfa
       });
   }
 
-  defaultMessage() {
-    return `$property must be a valid Animal Specie identifier`;
+  defaultMessage(args: ValidationArguments) {
+    return `${args.property} must be a valid identifier, ${args.value} is unknown`;
   }
 }
 

@@ -12,22 +12,26 @@ import {
 } from 'typeorm';
 import Puppy from '@app/db/entity/Puppy';
 import AnimalSpecie from '@app/db/entity/AnimalSpecie';
+import Personality from '@app/db/entity/Personality';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
 import { Duplicate } from '@app/common/error/DuplicateEntityError';
 import { EntityUtil } from '@app/util';
 import ImageService, { ImageType } from '@app/service/ImageService';
-import PersonalityRepository from './PersonalityRepository';
 
 @EntityRepository(Puppy)
 export default class PuppyRepository extends AbstractRepository<Puppy> {
   public saveOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
       // eslint-disable-next-line no-param-reassign
-      puppy.specie = await em.findOneOrFail(AnimalSpecie, puppy.specie, { select: ['id'] });
+      puppy.specie = em.create(AnimalSpecie, { id: (puppy.specie as unknown) as number });
       // eslint-disable-next-line no-param-reassign
-      puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities, em);
+      puppy.personalities = puppy.personalities
+        ? puppy.personalities.map((id) => {
+            return em.create(Personality, { id: (id as unknown) as number });
+          })
+        : [];
       return PuppyRepository.saveUnique(puppy, em);
     };
     if (entityManager === undefined) return this.manager.transaction(callback);
@@ -36,9 +40,12 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
 
   public updateOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
-      if (puppy.personalities)
+      if (puppy.personalities) {
         // eslint-disable-next-line no-param-reassign
-        puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities);
+        puppy.personalities = await puppy.personalities.map((id) => {
+          return em.create(Personality, { id: (id as unknown) as number });
+        });
+      }
       const puppyToUpdate: Puppy = await em.findOneOrFail(Puppy, puppy.id, {
         where: { user: puppy.user },
       });

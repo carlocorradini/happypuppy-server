@@ -27,7 +27,7 @@ import {
   IsArray,
   ArrayUnique,
 } from 'class-validator';
-import { IsValidAnimalSpecie } from '@app/common/validator';
+import { IsValidAnimalSpecie, IsValidPersonalityArray } from '@app/common/validator';
 import User from './User';
 import Personality from './Personality';
 import AnimalSpecie from './AnimalSpecie';
@@ -135,6 +135,9 @@ export default class Puppy {
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
   @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsValidPersonalityArray({
+    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+  })
   personalities!: Personality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
