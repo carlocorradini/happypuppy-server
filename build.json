@@ -8,7 +8,7 @@
         ],
         "folders": [
             "./src/public",
-            "./src/private",
+            "./src/tmp",
             "./src/view"
         ]
     }

@@ -27,8 +27,10 @@ import {
   IsArray,
   ArrayUnique,
 } from 'class-validator';
+import { IsValidAnimalSpecie } from '@app/common/validator';
 import User from './User';
 import Personality from './Personality';
+import AnimalSpecie from './AnimalSpecie';
 
 export enum PuppyValidationGroup {
   // eslint-disable-next-line no-unused-vars
@@ -106,6 +108,14 @@ export default class Puppy {
   @JoinColumn({ name: 'user_id' })
   @IsEmpty({ always: true })
   user!: User;
+
+  @ManyToOne(() => AnimalSpecie, (specie) => specie.puppies, { nullable: false })
+  @JoinColumn({ name: 'specie_id' })
+  @IsInt({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsPositive({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsValidAnimalSpecie({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
+  specie!: AnimalSpecie;
 
   @ManyToMany(() => Personality)
   @JoinTable({

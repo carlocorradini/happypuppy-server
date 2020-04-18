@@ -11,6 +11,7 @@ import {
   DeleteResult,
 } from 'typeorm';
 import Puppy from '@app/db/entity/Puppy';
+import AnimalSpecie from '@app/db/entity/AnimalSpecie';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
@@ -24,7 +25,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
   public saveOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
       // eslint-disable-next-line no-param-reassign
-      puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities);
+      puppy.specie = await em.findOneOrFail(AnimalSpecie, puppy.specie, { select: ['id'] });
+      // eslint-disable-next-line no-param-reassign
+      puppy.personalities = await PersonalityRepository.idsToEntity(puppy.personalities, em);
       return PuppyRepository.saveUnique(puppy, em);
     };
     if (entityManager === undefined) return this.manager.transaction(callback);

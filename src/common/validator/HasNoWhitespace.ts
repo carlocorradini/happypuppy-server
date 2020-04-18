@@ -9,24 +9,24 @@ import {
 } from 'class-validator';
 
 @ValidatorConstraint()
-export class NoWhitespaceConstraint implements ValidatorConstraintInterface {
-  public validate(value: string) {
+export class HasNoWhitespaceConstraint implements ValidatorConstraintInterface {
+  validate(value: string) {
     return typeof value === 'string' && !/\s/.test(value);
   }
 
-  public defaultMessage() {
+  defaultMessage() {
     return `$property must not contains any whitespace`;
   }
 }
 
-export default function NoWhitespace(validationOptions?: ValidationOptions) {
+export default function HasNoWhitespace(validationOptions?: ValidationOptions) {
   return (object: Object, propertyName: string) => {
     registerDecorator({
-      name: 'noWhitespace',
+      name: 'hasNoWhitespace',
       target: object.constructor,
       propertyName,
       options: validationOptions,
-      validator: NoWhitespaceConstraint,
+      validator: HasNoWhitespaceConstraint,
     });
   };
 }

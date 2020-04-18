@@ -21,7 +21,7 @@ import {
   IsISO8601,
 } from 'class-validator';
 import { CryptUtil } from '@app/util';
-import { NoWhitespace } from '@app/common/validator';
+import { HasNoWhitespace } from '@app/common/validator';
 import Puppy from './Puppy';
 
 export enum UserValidationGroup {
@@ -105,7 +105,7 @@ export default class User {
   @Column({ name: 'username', length: 128, unique: true, update: false })
   @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @NoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @HasNoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   username!: string;
 
@@ -174,22 +174,6 @@ export default class User {
 
   @BeforeInsert()
   defaultAvatar() {
-    switch (this.gender) {
-      case UserGender.MALE: {
-        this.avatar =
-          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/male.png';
-        break;
-      }
-      case UserGender.FEMALE: {
-        this.avatar =
-          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/female.png';
-        break;
-      }
-      default: {
-        this.avatar =
-          'https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/unknown.png';
-        break;
-      }
-    }
+    this.avatar = `https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/${this.gender}.png`;
   }
 }
