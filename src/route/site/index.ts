@@ -156,14 +156,11 @@ router.get('/password_reset/:token', async (req: Request, res: Response, next: N
     } else if (userPasswordReset && userPasswordReset.used) {
       options = {
         user: userPasswordReset.user,
-        token: undefined,
         used: true,
       };
     } else if (userPasswordReset) {
       options = {
         user: userPasswordReset.user,
-        token: undefined,
-        used: undefined,
       };
     }
 
