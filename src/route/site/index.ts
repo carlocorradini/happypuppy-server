@@ -6,6 +6,7 @@ import config from '@app/config';
 import UserPasswordReset from '@app/db/entity/UserPasswordReset';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
+import legal from './legal';
 
 const router = Router();
 
@@ -120,6 +121,8 @@ const animals = [
   '🦐',
   '🦑',
 ];
+
+router.use('/legal', legal);
 
 router.get('', (_req: Request, res: Response) => {
   res.render('index', {
