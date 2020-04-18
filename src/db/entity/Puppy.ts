@@ -109,7 +109,7 @@ export default class Puppy {
   @IsEmpty({ always: true })
   user!: User;
 
-  @ManyToOne(() => AnimalSpecie, (specie) => specie.puppies, { nullable: false })
+  @ManyToOne(() => AnimalSpecie, undefined, { nullable: false })
   @JoinColumn({ name: 'specie_id' })
   @IsInt({ groups: [PuppyValidationGroup.REGISTRATION] })
   @IsPositive({ groups: [PuppyValidationGroup.REGISTRATION] })
