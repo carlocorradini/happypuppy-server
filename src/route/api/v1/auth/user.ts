@@ -42,6 +42,20 @@ router.post(
   UserController.verify
 );
 router.post(
+  '/verify/:id/resend',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid User id',
+      },
+    })
+  ),
+  UserController.verifyResend
+);
+
+router.post(
   '/signin',
   ValidatorMiddleware.validateClass(User, UserValidationGroup.SIGN_IN),
   UserController.signIn

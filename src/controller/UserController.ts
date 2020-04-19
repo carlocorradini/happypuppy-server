@@ -77,9 +77,31 @@ export default class UserController {
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else if (ex instanceof UserAlreadyVerifiedError)
           ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
-        else if (ex instanceof DataMismatchError) {
+        else if (ex instanceof DataMismatchError)
           ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
-        } else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static verifyResend(req: Request, res: Response): void {
+    const { id } = req.params;
+
+    getManager()
+      .findOneOrFail(User, id)
+      .then((user) => getCustomRepository(UserVerificationRepository).verifyResendOrFail(user))
+      .then((userVerification) => {
+        logger.info(`Resended verification for User ${userVerification.user.id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to resend verification for User ${id} due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
+          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else if (ex instanceof UserAlreadyVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
 
