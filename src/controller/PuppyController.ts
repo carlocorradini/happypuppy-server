@@ -49,7 +49,7 @@ export default class PuppyController {
 
   public static update(req: Request, res: Response): void {
     const puppy: Puppy = req.app.locals.Puppy;
-    puppy.id = req.params.id;
+    puppy.id = Number.parseInt(req.params.id, 10);
     puppy.user = getManager().create(User, { id: req.user?.id ? req.user.id : '' });
 
     getCustomRepository(PuppyRepository)
@@ -71,7 +71,7 @@ export default class PuppyController {
 
   public static updateAvatar(req: Request, res: Response): void {
     const puppy: Puppy = getManager().create(Puppy, {
-      id: req.params.id,
+      id: Number.parseInt(req.params.id, 10),
       user: getManager().create(User, { id: req.user?.id ? req.user.id : '' }),
     });
 
@@ -91,7 +91,7 @@ export default class PuppyController {
 
   public static delete(req: Request, res: Response): void {
     const puppy: Puppy = getManager().create(Puppy, {
-      id: req.params.id,
+      id: Number.parseInt(req.params.id, 10),
       user: getManager().create(User, { id: req.user?.id ? req.user.id : '' }),
     });
 

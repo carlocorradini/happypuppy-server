@@ -34,9 +34,9 @@ export class IsValidPersonalityArrayConstraint implements ValidatorConstraintInt
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `${args.property} personalities must be valid identifiers, ${JSON.stringify(
-      this.invalidIds
-    )} ${this.invalidIds.length === 1 ? 'is' : 'are'} unknown`;
+    return `${args.property} must contain valid identifiers, ${JSON.stringify(this.invalidIds)} ${
+      this.invalidIds.length === 1 ? 'is' : 'are'
+    } unknown`;
   }
 }
 

@@ -59,10 +59,10 @@ export const PUPPY_MAX_WEIGHT: number = 190000000;
 @Entity('puppy')
 @Check(`weight >= ${PUPPY_MIN_WEIGHT} AND weight <= ${PUPPY_MAX_WEIGHT}`)
 export default class Puppy {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  @PrimaryGeneratedColumn('increment', { name: 'id' })
   @Index()
   @IsEmpty({ always: true })
-  id!: string;
+  id!: number;
 
   @Column({ name: 'name', length: 64 })
   @IsString({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })

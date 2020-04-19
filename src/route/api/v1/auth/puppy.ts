@@ -12,7 +12,7 @@ router.get(
     checkSchema({
       id: {
         in: ['params'],
-        isUUID: true,
+        isInt: true,
         errorMessage: 'Invalid Puppy id',
       },
     })
@@ -32,7 +32,7 @@ router.patch(
     checkSchema({
       id: {
         in: ['params'],
-        isUUID: true,
+        isInt: true,
         errorMessage: 'Invalid Puppy id',
       },
     })
@@ -47,7 +47,7 @@ router.patch(
     checkSchema({
       id: {
         in: ['params'],
-        isUUID: true,
+        isInt: true,
         errorMessage: 'Invalid Puppy id',
       },
     })
@@ -63,7 +63,7 @@ router.delete(
     checkSchema({
       id: {
         in: ['params'],
-        isUUID: true,
+        isInt: true,
         errorMessage: 'Invalid Puppy id',
       },
     })
