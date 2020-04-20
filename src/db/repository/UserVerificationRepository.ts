@@ -16,6 +16,28 @@ import UserRepository from './UserRepository';
 
 @EntityRepository(UserVerification)
 export default class UserVerificationRepository extends AbstractRepository<UserVerification> {
+  public findOneOrFail(user: User, entityManager: EntityManager): Promise<UserVerification> {
+    const callback = async (em: EntityManager) => {
+      const foundVerication = await em
+        .createQueryBuilder(UserVerification, 'uv')
+        .leftJoinAndSelect('uv.user', 'user')
+        .addSelect('user.verified')
+        .addSelect('user.email')
+        .addSelect('user.phone')
+        .where('uv.user.id = :user_id', { user_id: user.id })
+        .getOne();
+
+      if (foundVerication === undefined) throw new EntityNotFoundError('No verification was found');
+      if (foundVerication.user.verified)
+        throw new UserAlreadyVerifiedError('User was already verified');
+
+      return foundVerication;
+    };
+
+    if (entityManager === undefined) return this.manager.transaction(callback);
+    return callback(entityManager);
+  }
+
   public saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
     const callback = async (em: EntityManager) => {
       const userVerification: UserVerification = await em.save(
@@ -53,31 +75,9 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
     return callback(entityManager);
   }
 
-  public updateOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
-    const callback = async (em: EntityManager) => {
-      return this.saveOrFail(user, em);
-    };
-
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
-  }
-
   public verifyResendOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
     const callback = async (em: EntityManager) => {
-      const foundVerication = await em
-        .createQueryBuilder(UserVerification, 'uv')
-        .leftJoinAndSelect('uv.user', 'user')
-        .addSelect('user.verified')
-        .addSelect('user.email')
-        .addSelect('user.phone')
-        .where('uv.user.id = :user_id', { user_id: user.id })
-        .getOne();
-
-      if (foundVerication === undefined) throw new EntityNotFoundError('No verification was found');
-      if (foundVerication.user.verified)
-        throw new UserAlreadyVerifiedError('User was already verified');
-
-      return this.updateOrFail(foundVerication.user, em);
+      return this.saveOrFail((await this.findOneOrFail(user, em)).user, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);
@@ -89,16 +89,8 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
     entityManager?: EntityManager
   ): Promise<string> {
     const callback = async (em: EntityManager) => {
-      const foundVerication = await em
-        .createQueryBuilder(UserVerification, 'uv')
-        .leftJoinAndSelect('uv.user', 'user')
-        .addSelect('user.verified')
-        .where('uv.user.id = :user_id', { user_id: userVerification.user.id })
-        .getOne();
+      const foundVerication = await this.findOneOrFail(userVerification.user, em);
 
-      if (foundVerication === undefined) throw new EntityNotFoundError('No verification was found');
-      if (foundVerication.user.verified)
-        throw new UserAlreadyVerifiedError('User was already verified');
       if (
         foundVerication.otp_email !== userVerification.otp_email ||
         foundVerication.otp_phone !== userVerification.otp_phone
