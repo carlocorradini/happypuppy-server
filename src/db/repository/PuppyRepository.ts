@@ -13,6 +13,7 @@ import {
 import Puppy from '@app/db/entity/Puppy';
 import AnimalSpecie from '@app/db/entity/AnimalSpecie';
 import Personality from '@app/db/entity/Personality';
+import AnimalBreed from '@app/db/entity/AnimalBreed';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError } from '@app/common/error';
 // eslint-disable-next-line no-unused-vars
@@ -25,13 +26,28 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
   public saveOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
     const callback = async (em: EntityManager) => {
       // eslint-disable-next-line no-param-reassign
-      puppy.specie = em.create(AnimalSpecie, { id: (puppy.specie as unknown) as number });
+      puppy.specie = await em.findOneOrFail(AnimalSpecie, {
+        id: (puppy.specie as unknown) as number,
+      });
+      // eslint-disable-next-line no-param-reassign
+      puppy.breeds =
+        puppy.breeds && puppy.breeds.length > 0
+          ? [
+              await em.findOneOrFail(
+                AnimalBreed,
+                { id: (puppy.breeds[0] as unknown) as number },
+                { select: ['id', 'name'] }
+              ),
+              ...puppy.breeds
+                .slice(1)
+                .map((id) => em.create(AnimalBreed, { id: (id as unknown) as number })),
+            ]
+          : [];
       // eslint-disable-next-line no-param-reassign
       puppy.personalities = puppy.personalities
-        ? puppy.personalities.map((id) => {
-            return em.create(Personality, { id: (id as unknown) as number });
-          })
+        ? puppy.personalities.map((id) => em.create(Personality, { id: (id as unknown) as number }))
         : [];
+
       return PuppyRepository.saveUnique(puppy, em);
     };
     if (entityManager === undefined) return this.manager.transaction(callback);

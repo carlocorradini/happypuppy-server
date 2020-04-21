@@ -2,20 +2,20 @@
 import { Request, Response } from 'express';
 import { getManager } from 'typeorm';
 import logger from '@app/logger';
-import Personality from '@app/db/entity/Personality';
+import AnimalSpecie from '@app/db/entity/AnimalSpecie';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
-export default class PersonalityController {
+export default class AnimalSpecieController {
   public static all(_req: Request, res: Response): void {
     getManager()
-      .find(Personality)
-      .then((personalities) => {
-        logger.info(`Found ${personalities.length} Personalities`);
+      .find(AnimalSpecie)
+      .then((animalSpecies) => {
+        logger.info(`Found ${animalSpecies.length} Animal Species`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { personalities });
+        ResponseHelper.send(res, HttpStatusCode.OK, { animalSpecies });
       })
       .catch((ex) => {
-        logger.warn(`Failed to find Personalities due to ${ex.message}`);
+        logger.warn(`Failed to find Animal Species due to ${ex.message}`);
 
         ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
@@ -25,14 +25,14 @@ export default class PersonalityController {
     const { id } = req.params;
 
     getManager()
-      .findOneOrFail(Personality, id)
-      .then((personality) => {
-        logger.info(`Found Personality ${personality.id}`);
+      .findOneOrFail(AnimalSpecie, id)
+      .then((animalSpecie) => {
+        logger.info(`Found Animal Specie ${animalSpecie.id}`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, personality);
+        ResponseHelper.send(res, HttpStatusCode.OK, animalSpecie);
       })
       .catch((ex) => {
-        logger.warn(`Failed to find Personality ${id} due to ${ex.message}`);
+        logger.warn(`Failed to find Animal Specie ${id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
