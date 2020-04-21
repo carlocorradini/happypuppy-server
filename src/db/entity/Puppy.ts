@@ -27,10 +27,16 @@ import {
   IsArray,
   ArrayUnique,
 } from 'class-validator';
-import { IsValidAnimalSpecie, IsValidPersonalityArray } from '@app/common/validator';
+import {
+  IsValidAnimalSpecie,
+  IsValidPersonalityArray,
+  IsValidAnimalBreedArray,
+  IsAnimalBreedArrayBelongToAnimalSpecie,
+} from '@app/common/validator';
 import User from './User';
 import Personality from './Personality';
 import AnimalSpecie from './AnimalSpecie';
+import AnimalBreed from './AnimalBreed';
 
 export enum PuppyValidationGroup {
   // eslint-disable-next-line no-unused-vars
@@ -117,6 +123,26 @@ export default class Puppy {
   @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
   specie!: AnimalSpecie;
 
+  @ManyToMany(() => AnimalBreed)
+  @JoinTable({
+    name: 'puppy_animal_breed',
+    joinColumn: {
+      name: 'puppy_id',
+    },
+    inverseJoinColumn: {
+      name: 'breed_id',
+    },
+  })
+  @IsArray({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @ArrayUnique({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsInt({ each: true, groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsPositive({ each: true, groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsValidAnimalBreedArray({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsAnimalBreedArrayBelongToAnimalSpecie({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
+  breeds!: AnimalBreed[];
+
   @ManyToMany(() => Personality)
   @JoinTable({
     name: 'puppy_personality',
@@ -134,10 +160,10 @@ export default class Puppy {
     each: true,
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   @IsValidPersonalityArray({
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
+  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
   personalities!: Personality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
@@ -148,7 +174,10 @@ export default class Puppy {
 
   @BeforeInsert()
   defaultAvatar() {
-    // TODO tel sai cosa cambiare
-    this.avatar = '????';
+    this.avatar = `https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/puppy/avatar/${
+      !this.breeds || this.breeds.length === 0
+        ? this.specie.name.toLowerCase()
+        : `${this.specie.name}_${this.breeds[0].name.replace(/ /g, '_')}`.toLowerCase()
+    }.png`;
   }
 }
