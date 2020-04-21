@@ -117,7 +117,7 @@ export default class User {
 
   // TODO Aggiungere ismobilephone forced a true
   @Column({ name: 'phone', length: 15, unique: true, select: false, update: false })
-  @IsMobilePhone('any', { groups: [UserValidationGroup.REGISTRATION] })
+  @IsMobilePhone(undefined, { strictMode: true }, { groups: [UserValidationGroup.REGISTRATION] })
   @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   phone!: string;
