@@ -23,7 +23,6 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
         })
       );
       // TODO Change from
-      // TODO Change email URL to reset
       await EmailService.send({
         from: '"Happy Puppy" <password_reset@happypuppy.com>',
         to: user.email,
