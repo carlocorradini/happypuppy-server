@@ -30,7 +30,6 @@ export class IsAnimalBreedArrayBelongToAnimalSpecieConstraint
 
     const validIds: number[] = await getManager()
       .find(AnimalBreed, {
-        loadRelationIds: true,
         where: ids.map((id) => {
           return { id, specie: this.specie };
         }),
