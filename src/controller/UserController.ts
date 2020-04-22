@@ -25,7 +25,7 @@ export default class UserController {
     const { id } = req.params;
 
     getCustomRepository(UserRepository)
-      .findOneAndVerifiedOrFail(id)
+      .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
       .then((user) => {
         logger.info(`Found User ${user.id}`);
 
