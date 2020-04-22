@@ -29,14 +29,14 @@ import {
 } from 'class-validator';
 import {
   IsValidAnimalSpecie,
-  IsValidPersonalityArray,
+  IsValidAnimalPersonalityArray,
   IsValidAnimalBreedArray,
   IsAnimalBreedArrayBelongToAnimalSpecie,
 } from '@app/common/validator';
 import User from './User';
-import Personality from './Personality';
 import AnimalSpecie from './AnimalSpecie';
 import AnimalBreed from './AnimalBreed';
+import AnimalPersonality from './AnimalPersonality';
 
 export enum PuppyValidationGroup {
   // eslint-disable-next-line no-unused-vars
@@ -143,9 +143,9 @@ export default class Puppy {
   @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
   breeds!: AnimalBreed[];
 
-  @ManyToMany(() => Personality)
+  @ManyToMany(() => AnimalPersonality)
   @JoinTable({
-    name: 'puppy_personality',
+    name: 'puppy_animal_personality',
     joinColumn: {
       name: 'puppy_id',
     },
@@ -160,11 +160,11 @@ export default class Puppy {
     each: true,
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
-  @IsValidPersonalityArray({
+  @IsValidAnimalPersonalityArray({
     groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
   })
   @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  personalities!: Personality[];
+  personalities!: AnimalPersonality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
   created_at!: Date;

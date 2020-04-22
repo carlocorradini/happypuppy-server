@@ -40,18 +40,18 @@ export default class UserController {
       });
   }
 
-  public static register(req: Request, res: Response): void {
+  public static create(req: Request, res: Response): void {
     const user: User = req.app.locals.User;
 
     getCustomRepository(UserRepository)
       .saveOrFail(user)
       .then((newUser) => {
-        logger.info(`Registered User ${newUser.id}`);
+        logger.info(`Created User ${newUser.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.CREATED, { id: newUser.id });
       })
       .catch((ex) => {
-        logger.warn(`Failed to register User due to ${ex.message}`);
+        logger.warn(`Failed to create User due to ${ex.message}`);
 
         if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);

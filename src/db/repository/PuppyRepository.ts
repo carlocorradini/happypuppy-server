@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import Puppy from '@app/db/entity/Puppy';
 import AnimalSpecie from '@app/db/entity/AnimalSpecie';
-import Personality from '@app/db/entity/Personality';
+import Personality from '@app/db/entity/AnimalPersonality';
 import AnimalBreed from '@app/db/entity/AnimalBreed';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError } from '@app/common/error';

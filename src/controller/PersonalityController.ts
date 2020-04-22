@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { getManager } from 'typeorm';
 import logger from '@app/logger';
-import Personality from '@app/db/entity/Personality';
+import Personality from '@app/db/entity/AnimalPersonality';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class PersonalityController {

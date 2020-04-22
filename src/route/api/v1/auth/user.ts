@@ -25,7 +25,7 @@ router.get(
 router.post(
   '',
   ValidatorMiddleware.validateClass(User, UserValidationGroup.REGISTRATION),
-  UserController.register
+  UserController.create
 );
 router.post(
   '/verify/:id',
