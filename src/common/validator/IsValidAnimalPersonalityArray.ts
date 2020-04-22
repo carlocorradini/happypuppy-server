@@ -10,10 +10,10 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { getManager } from 'typeorm';
-import Personality from '@app/db/entity/Personality';
+import Personality from '@app/db/entity/AnimalPersonality';
 
 @ValidatorConstraint({ async: true })
-export class IsValidPersonalityArrayConstraint implements ValidatorConstraintInterface {
+export class IsValidAnimalPersonalityArrayConstraint implements ValidatorConstraintInterface {
   private invalidIds: number[] = [];
 
   async validate(ids: number[]) {
@@ -40,14 +40,14 @@ export class IsValidPersonalityArrayConstraint implements ValidatorConstraintInt
   }
 }
 
-export default function IsValidPersonalityArray(validationOptions?: ValidationOptions) {
+export default function IsValidAnimalPersonalityArray(validationOptions?: ValidationOptions) {
   return (object: Object, propertyName: string) => {
     registerDecorator({
-      name: 'isValidPersonalityArray',
+      name: 'isValidAnimalPersonalityArray',
       target: object.constructor,
       propertyName,
       options: validationOptions,
-      validator: IsValidPersonalityArrayConstraint,
+      validator: IsValidAnimalPersonalityArrayConstraint,
     });
   };
 }

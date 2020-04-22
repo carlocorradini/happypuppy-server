@@ -56,6 +56,31 @@ export default class User {
   @IsEmpty({ always: true })
   id!: string;
 
+  @Column({ name: 'username', length: 128, unique: true, update: false })
+  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @HasNoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
+  username!: string;
+
+  @Column({ name: 'password', length: 72, select: false })
+  @IsString({
+    groups: [
+      UserValidationGroup.REGISTRATION,
+      UserValidationGroup.SIGN_IN,
+      UserValidationGroup.UPDATE,
+    ],
+  })
+  @Length(8, 64, {
+    groups: [
+      UserValidationGroup.REGISTRATION,
+      UserValidationGroup.SIGN_IN,
+      UserValidationGroup.UPDATE,
+    ],
+  })
+  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
+  password!: string;
+
   @Column({
     name: 'role',
     type: 'enum',
@@ -102,13 +127,6 @@ export default class User {
   @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
   date_of_birth!: Date;
 
-  @Column({ name: 'username', length: 128, unique: true, update: false })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @HasNoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
-  username!: string;
-
   @Column({ name: 'email', length: 128, unique: true, select: false, update: false })
   @IsEmail(undefined, { groups: [UserValidationGroup.REGISTRATION] })
   @Length(3, 128, { groups: [UserValidationGroup.REGISTRATION] })
@@ -120,24 +138,6 @@ export default class User {
   @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   phone!: string;
-
-  @Column({ name: 'password', length: 72, select: false })
-  @IsString({
-    groups: [
-      UserValidationGroup.REGISTRATION,
-      UserValidationGroup.SIGN_IN,
-      UserValidationGroup.UPDATE,
-    ],
-  })
-  @Length(8, 64, {
-    groups: [
-      UserValidationGroup.REGISTRATION,
-      UserValidationGroup.SIGN_IN,
-      UserValidationGroup.UPDATE,
-    ],
-  })
-  @IsOptional({ groups: [UserValidationGroup.UPDATE] })
-  password!: string;
 
   @Column({ name: 'avatar', length: 256 })
   @IsEmpty({ always: true })

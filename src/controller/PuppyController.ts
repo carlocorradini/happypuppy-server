@@ -27,19 +27,19 @@ export default class PuppyController {
       });
   }
 
-  public static register(req: Request, res: Response): void {
+  public static create(req: Request, res: Response): void {
     const puppy: Puppy = req.app.locals.Puppy;
     puppy.user = getManager().create(User, { id: req.user?.id ? req.user.id : '' });
 
     getCustomRepository(PuppyRepository)
       .saveOrFail(puppy)
       .then((newPuppy) => {
-        logger.info(`Registered Puppy ${newPuppy.id}`);
+        logger.info(`Created Puppy ${newPuppy.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.CREATED, { id: newPuppy.id });
       })
       .catch((ex) => {
-        logger.warn(`Failed to register Puppy due to ${ex.message}`);
+        logger.warn(`Failed to create Puppy due to ${ex.message}`);
 
         if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);

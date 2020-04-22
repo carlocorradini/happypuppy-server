@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import jwt from 'express-jwt';
 import config from '@app/config';
-import personality from './personality';
+// eslint-disable-next-line camelcase
+import animal_personality from './animal_personality';
 // eslint-disable-next-line camelcase
 import animal_specie from './animal_specie';
 // eslint-disable-next-line camelcase
@@ -10,7 +11,7 @@ import auth from './auth';
 
 const router = Router();
 
-router.use('/personality', personality);
+router.use('/animal_personality', animal_personality);
 
 router.use('/animal_specie', animal_specie);
 

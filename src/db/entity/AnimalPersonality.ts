@@ -1,8 +1,8 @@
 import { Entity, Index, Column, Check, PrimaryColumn } from 'typeorm';
 
-@Entity('personality')
+@Entity('animal_personality')
 @Check(`"id" > 0`)
-export default class Personality {
+export default class AnimalPersonality {
   @PrimaryColumn({ name: 'id' })
   @Index()
   id!: number;
