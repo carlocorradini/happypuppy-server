@@ -3,17 +3,11 @@ import { Request, Response } from 'express';
 import { getCustomRepository, getManager } from 'typeorm';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
-// eslint-disable-next-line no-unused-vars
-import UserVerification from '@app/db/entity/UserVerification';
 import UserRepository from '@app/db/repository/UserRepository';
-import UserVerificationRepository from '@app/db/repository/UserVerificationRepository';
 import UserPasswordResetRepository from '@app/db/repository/UserPasswordResetRepository';
 import {
   DuplicateEntityError,
   UserNotVerifiedError,
-  UserAlreadyVerifiedError,
-  EntityNotFoundError,
-  DataMismatchError,
   InvalidTokenException,
 } from '@app/common/error';
 import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
@@ -25,7 +19,7 @@ export default class UserController {
     const { id } = req.params;
 
     getCustomRepository(UserRepository)
-      .findOneAndVerifiedOrFail(id)
+      .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
       .then((user) => {
         logger.info(`Found User ${user.id}`);
 
@@ -48,59 +42,13 @@ export default class UserController {
       .then((newUser) => {
         logger.info(`Created User ${newUser.id}`);
 
-        ResponseHelper.send(res, HttpStatusCode.CREATED, { id: newUser.id });
+        ResponseHelper.send(res, HttpStatusCode.CREATED, newUser.id);
       })
       .catch((ex) => {
         logger.warn(`Failed to create User due to ${ex.message}`);
 
         if (ex instanceof DuplicateEntityError)
           ResponseHelper.send(res, HttpStatusCode.CONFLICT, ex.errors);
-        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
-      });
-  }
-
-  public static verify(req: Request, res: Response): void {
-    const userVerification: UserVerification = req.app.locals.UserVerification;
-    userVerification.user = getManager().create(User, { id: req.params.id });
-
-    getCustomRepository(UserVerificationRepository)
-      .verifyOrFail(userVerification)
-      .then((token) => {
-        logger.info(`Verification succeeded for User ${userVerification.user.id}`);
-
-        ResponseHelper.send(res, HttpStatusCode.OK, { token });
-      })
-      .catch((ex) => {
-        logger.warn(`Failed to verify User ${userVerification.user.id} due to ${ex.message}`);
-
-        if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
-          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
-        else if (ex instanceof UserAlreadyVerifiedError)
-          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
-        else if (ex instanceof DataMismatchError)
-          ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
-        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
-      });
-  }
-
-  public static verifyResend(req: Request, res: Response): void {
-    const { id } = req.params;
-
-    getManager()
-      .findOneOrFail(User, id)
-      .then((user) => getCustomRepository(UserVerificationRepository).verifyResendOrFail(user))
-      .then((userVerification) => {
-        logger.info(`Resended verification for User ${userVerification.user.id}`);
-
-        ResponseHelper.send(res, HttpStatusCode.OK);
-      })
-      .catch((ex) => {
-        logger.warn(`Failed to resend verification for User ${id} due to ${ex.message}`);
-
-        if (ex.name === 'EntityNotFound' || ex instanceof EntityNotFoundError)
-          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
-        else if (ex instanceof UserAlreadyVerifiedError)
-          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
@@ -118,7 +66,7 @@ export default class UserController {
           `Authentication with credentials succeeded for User ${(await JWTHelper.verify(token)).id}`
         );
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { token });
+        ResponseHelper.send(res, HttpStatusCode.OK, token);
       })
       .catch((ex) => {
         logger.warn(`Failed to authenticate User with credentials due to ${ex.message}`);

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
 import { ValidatorMiddleware } from '@app/middleware';
-import { PersonalityController } from '@app/controller';
+import { AnimalPersonalityController } from '@app/controller';
 
 const router = Router();
 
-router.get('', PersonalityController.all);
+router.get('', AnimalPersonalityController.all);
 
 router.get(
   '/:id',
@@ -18,7 +18,7 @@ router.get(
       },
     })
   ),
-  PersonalityController.find
+  AnimalPersonalityController.find
 );
 
 export default router;

@@ -5,14 +5,14 @@ import logger from '@app/logger';
 import Personality from '@app/db/entity/AnimalPersonality';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
-export default class PersonalityController {
+export default class AnimalPersonalityController {
   public static all(_req: Request, res: Response): void {
     getManager()
       .find(Personality)
       .then((personalities) => {
         logger.info(`Found ${personalities.length} Personalities`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { personalities });
+        ResponseHelper.send(res, HttpStatusCode.OK, personalities);
       })
       .catch((ex) => {
         logger.warn(`Failed to find Personalities due to ${ex.message}`);

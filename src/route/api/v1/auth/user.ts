@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { checkSchema } from 'express-validator';
 import User, { UserValidationGroup } from '@app/db/entity/User';
 import UserPasswordReset from '@app/db/entity/UserPasswordReset';
-import UserVerification from '@app/db/entity/UserVerification';
 import { UserController } from '@app/controller';
 import { ValidatorMiddleware, FileMiddleware } from '@app/middleware';
 
@@ -24,39 +23,11 @@ router.get(
 
 router.post(
   '',
-  ValidatorMiddleware.validateClass(User, UserValidationGroup.REGISTRATION),
+  ValidatorMiddleware.validateClass(User, UserValidationGroup.CREATION),
   UserController.create
 );
 router.post(
-  '/verify/:id',
-  ValidatorMiddleware.validateChain(
-    checkSchema({
-      id: {
-        in: ['params'],
-        isUUID: true,
-        errorMessage: 'Invalid User id',
-      },
-    })
-  ),
-  ValidatorMiddleware.validateClass(UserVerification),
-  UserController.verify
-);
-router.post(
-  '/verify/:id/resend',
-  ValidatorMiddleware.validateChain(
-    checkSchema({
-      id: {
-        in: ['params'],
-        isUUID: true,
-        errorMessage: 'Invalid User id',
-      },
-    })
-  ),
-  UserController.verifyResend
-);
-
-router.post(
-  '/signin',
+  '/sign_in',
   ValidatorMiddleware.validateClass(User, UserValidationGroup.SIGN_IN),
   UserController.signIn
 );

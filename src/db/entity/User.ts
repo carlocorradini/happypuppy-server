@@ -26,7 +26,7 @@ import Puppy from './Puppy';
 
 export enum UserValidationGroup {
   // eslint-disable-next-line no-unused-vars
-  REGISTRATION = 'registration',
+  CREATION = 'creation',
   // eslint-disable-next-line no-unused-vars
   SIGN_IN = 'sign_in',
   // eslint-disable-next-line no-unused-vars
@@ -57,26 +57,18 @@ export default class User {
   id!: string;
 
   @Column({ name: 'username', length: 128, unique: true, update: false })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @Length(1, 128, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
-  @HasNoWhitespace({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.SIGN_IN] })
+  @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.SIGN_IN] })
+  @Length(1, 128, { groups: [UserValidationGroup.CREATION, UserValidationGroup.SIGN_IN] })
+  @HasNoWhitespace({ groups: [UserValidationGroup.CREATION, UserValidationGroup.SIGN_IN] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   username!: string;
 
   @Column({ name: 'password', length: 72, select: false })
   @IsString({
-    groups: [
-      UserValidationGroup.REGISTRATION,
-      UserValidationGroup.SIGN_IN,
-      UserValidationGroup.UPDATE,
-    ],
+    groups: [UserValidationGroup.CREATION, UserValidationGroup.SIGN_IN, UserValidationGroup.UPDATE],
   })
   @Length(8, 64, {
-    groups: [
-      UserValidationGroup.REGISTRATION,
-      UserValidationGroup.SIGN_IN,
-      UserValidationGroup.UPDATE,
-    ],
+    groups: [UserValidationGroup.CREATION, UserValidationGroup.SIGN_IN, UserValidationGroup.UPDATE],
   })
   @IsOptional({ groups: [UserValidationGroup.UPDATE] })
   password!: string;
@@ -88,7 +80,7 @@ export default class User {
     default: UserRole.STANDARD,
   })
   @IsEnum(UserRole, { groups: [UserValidationGroup.UPDATE] })
-  @IsEmpty({ groups: [UserValidationGroup.REGISTRATION] })
+  @IsEmpty({ groups: [UserValidationGroup.CREATION] })
   @IsOptional({ groups: [UserValidationGroup.UPDATE] })
   role!: UserRole;
 
@@ -97,15 +89,15 @@ export default class User {
   verified!: boolean;
 
   @Column({ name: 'name', length: 64, nullable: true, default: undefined })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @Length(1, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   name!: string;
 
   @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
-  @IsString({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @Length(1, 64, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @Length(1, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   surname!: string;
 
   @Column({
@@ -115,27 +107,27 @@ export default class User {
     default: UserGender.UNKNOWN,
     update: false,
   })
-  @IsEnum(UserGender, { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
-  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsEnum(UserGender, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   gender!: UserGender;
 
   @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
   @IsISO8601(
     { strict: true },
-    { groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] }
+    { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] }
   )
-  @IsOptional({ groups: [UserValidationGroup.REGISTRATION, UserValidationGroup.UPDATE] })
+  @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   date_of_birth!: Date;
 
   @Column({ name: 'email', length: 128, unique: true, select: false, update: false })
-  @IsEmail(undefined, { groups: [UserValidationGroup.REGISTRATION] })
-  @Length(3, 128, { groups: [UserValidationGroup.REGISTRATION] })
+  @IsEmail(undefined, { groups: [UserValidationGroup.CREATION] })
+  @Length(3, 128, { groups: [UserValidationGroup.CREATION] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   email!: string;
 
   @Column({ name: 'phone', length: 15, unique: true, select: false, update: false })
-  @IsMobilePhone(undefined, { strictMode: true }, { groups: [UserValidationGroup.REGISTRATION] })
-  @Length(8, 15, { groups: [UserValidationGroup.REGISTRATION] })
+  @IsMobilePhone(undefined, { strictMode: true }, { groups: [UserValidationGroup.CREATION] })
+  @Length(8, 15, { groups: [UserValidationGroup.CREATION] })
   @IsEmpty({ groups: [UserValidationGroup.UPDATE] })
   phone!: string;
 
