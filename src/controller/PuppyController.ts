@@ -36,7 +36,7 @@ export default class PuppyController {
       .then((newPuppy) => {
         logger.info(`Created Puppy ${newPuppy.id}`);
 
-        ResponseHelper.send(res, HttpStatusCode.CREATED, { id: newPuppy.id });
+        ResponseHelper.send(res, HttpStatusCode.CREATED, newPuppy.id);
       })
       .catch((ex) => {
         logger.warn(`Failed to create Puppy due to ${ex.message}`);

@@ -12,7 +12,7 @@ export default class AnimalSpecieController {
       .then((animalSpecies) => {
         logger.info(`Found ${animalSpecies.length} Animal Species`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { animalSpecies });
+        ResponseHelper.send(res, HttpStatusCode.OK, animalSpecies);
       })
       .catch((ex) => {
         logger.warn(`Failed to find Animal Species due to ${ex.message}`);

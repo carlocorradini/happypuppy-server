@@ -22,7 +22,7 @@ router.get(
 
 router.post(
   '',
-  ValidatorMiddleware.validateClass(Puppy, PuppyValidationGroup.REGISTRATION),
+  ValidatorMiddleware.validateClass(Puppy, PuppyValidationGroup.CREATION),
   PuppyController.create
 );
 

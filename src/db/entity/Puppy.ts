@@ -40,7 +40,7 @@ import AnimalPersonality from './AnimalPersonality';
 
 export enum PuppyValidationGroup {
   // eslint-disable-next-line no-unused-vars
-  REGISTRATION = 'registration',
+  CREATION = 'creation',
   // eslint-disable-next-line no-unused-vars
   UPDATE = 'update',
 }
@@ -71,8 +71,8 @@ export default class Puppy {
   id!: number;
 
   @Column({ name: 'name', length: 64 })
-  @IsString({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @Length(1, 64, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsString({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @Length(1, 64, { groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
   name!: string;
 
@@ -82,28 +82,28 @@ export default class Puppy {
     enum: PuppyGender,
     update: false,
   })
-  @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
   gender!: PuppyGender;
 
   @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
   @IsISO8601(
     { strict: true },
-    { groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] }
+    { groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] }
   )
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   date_of_birth!: Date;
 
   @Column({ name: 'weight', type: 'integer', nullable: true, default: undefined })
-  @IsInt({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @IsPositive({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsInt({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @IsPositive({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @Min(PUPPY_MIN_WEIGHT, {
-    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+    groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
   @Max(PUPPY_MAX_WEIGHT, {
-    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+    groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   weight!: number;
 
   @Column({ name: 'avatar', length: 256 })
@@ -117,9 +117,9 @@ export default class Puppy {
 
   @ManyToOne(() => AnimalSpecie, undefined, { nullable: false })
   @JoinColumn({ name: 'specie_id' })
-  @IsInt({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsPositive({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsValidAnimalSpecie({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsInt({ groups: [PuppyValidationGroup.CREATION] })
+  @IsPositive({ groups: [PuppyValidationGroup.CREATION] })
+  @IsValidAnimalSpecie({ groups: [PuppyValidationGroup.CREATION] })
   @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
   specie!: AnimalSpecie;
 
@@ -133,13 +133,13 @@ export default class Puppy {
       name: 'breed_id',
     },
   })
-  @IsArray({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @ArrayUnique({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsInt({ each: true, groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsPositive({ each: true, groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsValidAnimalBreedArray({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsAnimalBreedArrayBelongToAnimalSpecie({ groups: [PuppyValidationGroup.REGISTRATION] })
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION] })
+  @IsArray({ groups: [PuppyValidationGroup.CREATION] })
+  @ArrayUnique({ groups: [PuppyValidationGroup.CREATION] })
+  @IsInt({ each: true, groups: [PuppyValidationGroup.CREATION] })
+  @IsPositive({ each: true, groups: [PuppyValidationGroup.CREATION] })
+  @IsValidAnimalBreedArray({ groups: [PuppyValidationGroup.CREATION] })
+  @IsAnimalBreedArrayBelongToAnimalSpecie({ groups: [PuppyValidationGroup.CREATION] })
+  @IsOptional({ groups: [PuppyValidationGroup.CREATION] })
   @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
   breeds!: AnimalBreed[];
 
@@ -153,17 +153,17 @@ export default class Puppy {
       name: 'personality_id',
     },
   })
-  @IsArray({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @ArrayUnique({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
-  @IsInt({ each: true, groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsArray({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @ArrayUnique({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @IsInt({ each: true, groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @IsPositive({
     each: true,
-    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+    groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
   @IsValidAnimalPersonalityArray({
-    groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE],
+    groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
-  @IsOptional({ groups: [PuppyValidationGroup.REGISTRATION, PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   personalities!: AnimalPersonality[];
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsNumberString, Length, IsEmpty } from 'class-validator';
+import { IsNumberString, Length, IsUUID } from 'class-validator';
 import config from '@app/config';
 import User from './User';
 
@@ -8,7 +8,7 @@ import User from './User';
 export default class UserVerification {
   @OneToOne(() => User, { primary: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  @IsEmpty({ always: true })
+  @IsUUID()
   user!: User;
 
   @Column({ name: 'otp_email', length: config.SECURITY.OTP.EMAIL.DIGITS })
