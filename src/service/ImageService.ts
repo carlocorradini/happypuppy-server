@@ -14,7 +14,7 @@ export interface ImageTypeFolders extends Record<ImageType, string[]> {
   [ImageType.AVATAR]: ['user/avatar', 'puppy/avatar'];
 }
 
-export const ImageTypeOptions: Record<ImageType, cloudinary.UpdateApiOptions> = {
+export const ImageTypeOptions: Record<ImageType, cloudinary.UploadApiOptions> = {
   [ImageType.AVATAR]: {
     width: 512,
     height: 512,

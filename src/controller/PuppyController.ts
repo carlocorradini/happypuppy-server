@@ -80,7 +80,7 @@ export default class PuppyController {
       .then((upPuppy) => {
         logger.info(`Changed avatar for Puppy ${upPuppy.id} to ${upPuppy.avatar}`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { avatar: upPuppy.avatar });
+        ResponseHelper.send(res, HttpStatusCode.OK, upPuppy.avatar);
       })
       .catch((ex) => {
         logger.error(`Failed to change avatar for Puppy ${puppy.id} due to ${ex.message}`);

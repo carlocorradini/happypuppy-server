@@ -145,7 +145,7 @@ export default class UserController {
       .then((user) => {
         logger.info(`Changed avatar for User ${user.id} to ${user.avatar}`);
 
-        ResponseHelper.send(res, HttpStatusCode.OK, { avatar: user.avatar });
+        ResponseHelper.send(res, HttpStatusCode.OK, user.avatar);
       })
       .catch((ex) => {
         logger.error(`Failed to change avatar for User ${id} due to ${ex.message}`);
