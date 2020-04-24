@@ -71,7 +71,8 @@ export default class UserController {
       .catch((ex) => {
         logger.warn(`Failed to authenticate User with credentials due to ${ex.message}`);
 
-        if (ex instanceof UserNotVerifiedError) ResponseHelper.send(res, HttpStatusCode.FORBIDDEN);
+        if (ex instanceof UserNotVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.FORBIDDEN, ex.id);
         else ResponseHelper.send(res, HttpStatusCode.UNAUTHORIZED);
       });
   }

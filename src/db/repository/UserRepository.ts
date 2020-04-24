@@ -37,7 +37,7 @@ export default class UserRepository extends AbstractRepository<User> {
       { select: ['id', 'username', 'password', 'verified'] }
     );
     await CryptUtil.compareOrFail(user.password, foundUser.password);
-    if (!foundUser.verified) throw new UserNotVerifiedError('User not verified');
+    if (!foundUser.verified) throw new UserNotVerifiedError('User not verified', foundUser.id);
     return JWTHelper.sign({
       id: foundUser.id,
       role: foundUser.role,
