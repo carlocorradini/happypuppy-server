@@ -23,6 +23,7 @@ import {
 import { CryptUtil } from '@app/util';
 import { HasNoWhitespace } from '@app/common/validator';
 import Puppy from './Puppy';
+import UserFriend from './UserFriend';
 
 export enum UserValidationGroup {
   // eslint-disable-next-line no-unused-vars
@@ -139,10 +140,16 @@ export default class User {
   @IsEmpty({ always: true })
   puppies!: Puppy[];
 
+  @OneToMany(() => UserFriend, (userFriend) => userFriend.user)
+  @IsEmpty({ always: true })
+  friends!: UserFriend[];
+
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @IsEmpty({ always: true })
   created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', select: false })
+  @IsEmpty({ always: true })
   updated_at!: Date;
 
   @BeforeInsert()

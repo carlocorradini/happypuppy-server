@@ -66,9 +66,7 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
 
       await em.save(UserPasswordReset, foundUserPasswordReset);
 
-      return Promise.resolve(
-        getCustomRepository(UserRepository).updateOrFail(foundUserPasswordReset.user, em)
-      );
+      return getCustomRepository(UserRepository).updateOrFail(foundUserPasswordReset.user, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);

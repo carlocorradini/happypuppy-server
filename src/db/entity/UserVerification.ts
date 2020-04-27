@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { Entity, OneToOne, JoinColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsNumberString, Length, IsUUID } from 'class-validator';
+import { IsNumberString, Length, IsUUID, IsEmpty } from 'class-validator';
 import config from '@app/config';
 import User from './User';
 
@@ -22,8 +22,10 @@ export default class UserVerification {
   otp_phone!: string;
 
   @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @IsEmpty({ always: true })
   created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', select: false })
+  @IsEmpty({ always: true })
   updated_at!: Date;
 }

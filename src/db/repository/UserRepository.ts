@@ -19,6 +19,8 @@ import {
 } from 'typeorm';
 // eslint-disable-next-line no-unused-vars
 import User from '@app/db/entity/User';
+// eslint-disable-next-line no-unused-vars
+import UserFriend, { UserFriendType } from '@app/db/entity/UserFriend';
 import { EntityUtil, CryptUtil } from '@app/util';
 // eslint-disable-next-line no-unused-vars
 import { DuplicateEntityError, UserNotVerifiedError } from '@app/common/error';
@@ -76,6 +78,25 @@ export default class UserRepository extends AbstractRepository<User> {
       maybeOptions
     );
     if (!user.verified) throw new UserNotVerifiedError('User not verified');
+
+    if (user.friends) {
+      user.friends = await this.manager
+        .find(UserFriend, {
+          where: user.friends.map((userFriend) => {
+            return {
+              user: (userFriend.user as unknown) as string,
+              friend: (userFriend.friend as unknown) as string,
+            };
+          }),
+          loadRelationIds: true,
+        })
+        .then((userFriends) =>
+          userFriends
+            .filter((userFriend) => userFriend.type === UserFriendType.FRIEND)
+            .map((userFriend) => (userFriend.friend as unknown) as UserFriend)
+        );
+    }
+
     return Promise.resolve(user);
   }
 
@@ -157,6 +178,20 @@ export default class UserRepository extends AbstractRepository<User> {
         }
       });
     });
+
+    if (
+      !isUpdateOperation &&
+      (await entityManager.findOne(User, {
+        where: {
+          id: user.id,
+        },
+      })) !== undefined
+    ) {
+      duplicateFields.add({
+        property: `id`,
+        value: user.id,
+      });
+    }
 
     if (duplicateFields.size !== 0)
       throw new DuplicateEntityError(`Duplicate User entity found`, Array.from(duplicateFields));

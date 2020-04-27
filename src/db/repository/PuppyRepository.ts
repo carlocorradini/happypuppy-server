@@ -132,6 +132,20 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
       });
     });
 
+    if (
+      !isUpdateOperation &&
+      (await entityManager.findOne(Puppy, {
+        where: {
+          id: puppy.id,
+        },
+      })) !== undefined
+    ) {
+      duplicateFields.add({
+        property: `id`,
+        value: puppy.id,
+      });
+    }
+
     if (duplicateFields.size !== 0)
       throw new DuplicateEntityError(`Duplicate Puppy entity found`, Array.from(duplicateFields));
 
