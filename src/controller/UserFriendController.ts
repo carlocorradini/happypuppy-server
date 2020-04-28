@@ -18,12 +18,12 @@ export default class UserFriendController {
         loadRelationIds: true,
       })
       .then((userFriends) => {
-        logger.info(`Found ${userFriends.length} User Friends for ${user.id}`);
+        logger.info(`Found ${userFriends.length} User Friends of ${user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK, userFriends);
       })
       .catch((ex) => {
-        logger.warn(`Failed to find User Friends for ${user.id} due to ${ex.message}`);
+        logger.warn(`Failed to find User Friends of ${user.id} due to ${ex.message}`);
 
         ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
@@ -34,17 +34,23 @@ export default class UserFriendController {
     const friend: User = getManager().create(User, { id: req.params.id });
 
     getManager()
-      .findOneOrFail(UserFriend, {
-        where: { user, friend },
-        loadRelationIds: true,
-      })
+      .findOneOrFail(
+        UserFriend,
+        {
+          user,
+          friend,
+        },
+        {
+          loadRelationIds: true,
+        }
+      )
       .then((userFriend) => {
         logger.info(`Found User Friend ${userFriend.friend} of ${user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK, userFriend);
       })
       .catch((ex) => {
-        logger.warn(`Failed to find User Friend ${friend.id} due to ${ex.message}`);
+        logger.warn(`Failed to find User Friend ${friend.id} of ${user.id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
@@ -59,13 +65,13 @@ export default class UserFriendController {
     getCustomRepository(UserFriendRepository)
       .saveOrFail(userFriend)
       .then((newUserFriend) => {
-        logger.info(`Created User Friend ${newUserFriend.friend.id} for ${newUserFriend.user.id}`);
+        logger.info(`Created User Friend ${newUserFriend.friend.id} of ${newUserFriend.user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.CREATED);
       })
       .catch((ex) => {
         logger.warn(
-          `Failed to create User Friend ${userFriend.friend.id} for ${userFriend.user.id} due to ${ex.message}`
+          `Failed to create User Friend ${userFriend.friend.id} of ${userFriend.user.id} due to ${ex.message}`
         );
 
         if (ex instanceof DuplicateEntityError)
@@ -82,13 +88,13 @@ export default class UserFriendController {
     getCustomRepository(UserFriendRepository)
       .updateOrFail(userFriend)
       .then((upUserFriend) => {
-        logger.info(`Updated User Friend ${upUserFriend.friend.id} for ${upUserFriend.user.id}`);
+        logger.info(`Updated User Friend ${upUserFriend.friend.id} of ${upUserFriend.user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK);
       })
       .catch((ex) => {
         logger.warn(
-          `Failed to update User Friend ${userFriend.friend.id} for ${userFriend.user.id} due to ${ex.message}`
+          `Failed to update User Friend ${userFriend.friend.id} of ${userFriend.user.id} due to ${ex.message}`
         );
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
@@ -107,13 +113,13 @@ export default class UserFriendController {
     getCustomRepository(UserFriendRepository)
       .deleteOrFail(userFriend)
       .then(() => {
-        logger.info(`Deleted User Friend ${userFriend.friend.id} for ${userFriend.user.id}`);
+        logger.info(`Deleted User Friend ${userFriend.friend.id} of ${userFriend.user.id}`);
 
         ResponseHelper.send(res, HttpStatusCode.OK);
       })
       .catch((ex) => {
         logger.warn(
-          `Failed to delete User Friend ${userFriend.friend.id} for ${userFriend.user.id} due to ${ex.message}`
+          `Failed to delete User Friend ${userFriend.friend.id} of ${userFriend.user.id} due to ${ex.message}`
         );
 
         if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
