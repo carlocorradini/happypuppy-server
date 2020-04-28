@@ -77,8 +77,6 @@ export default class UserRepository extends AbstractRepository<User> {
     );
     if (!user.verified) throw new UserNotVerifiedError('User not verified');
 
-    delete user.friends;
-
     return Promise.resolve(user);
   }
 

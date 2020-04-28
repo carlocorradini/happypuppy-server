@@ -23,6 +23,8 @@ export default class UserController {
       .then((user) => {
         logger.info(`Found User ${user.id}`);
 
+        // eslint-disable-next-line no-param-reassign
+        delete user.friends;
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
