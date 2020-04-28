@@ -43,4 +43,18 @@ router.patch(
   UserFriendController.update
 );
 
+router.delete(
+  '/:id',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      id: {
+        in: ['params'],
+        isUUID: true,
+        errorMessage: 'Invalid User Friend id',
+      },
+    })
+  ),
+  UserFriendController.delete
+);
+
 export default router;

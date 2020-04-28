@@ -123,24 +123,12 @@ export default class UserFriendRepository extends AbstractRepository<UserFriend>
     return callback(entityManager);
   }
 
-  public deleteOrFail(
-    userFriend: UserFriend,
-    entityManager?: EntityManager
-  ): Promise<DeleteResult> {
+  public deleteOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
     const callback = async (em: EntityManager) => {
-      await em.findOneOrFail(UserFriend, {
-        user: userFriend.user,
-        friend: userFriend.friend,
-      });
+      // eslint-disable-next-line no-param-reassign
+      userFriend.type = UserFriendType.DELETED;
 
-      await em.findOneOrFail(UserFriend, {
-        user: userFriend.friend,
-        friend: userFriend.user,
-      });
-
-      await em.delete(UserFriend, { user: userFriend.friend, friend: userFriend.user });
-
-      return em.delete(UserFriend, { user: userFriend.user, friend: userFriend.friend });
+      return this.updateOrFail(userFriend, em);
     };
 
     if (entityManager === undefined) return this.manager.transaction(callback);

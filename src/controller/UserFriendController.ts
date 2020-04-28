@@ -97,4 +97,27 @@ export default class UserFriendController {
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
+
+  public static delete(req: Request, res: Response): void {
+    const userFriend: UserFriend = getManager().create(UserFriend, {
+      user: getManager().create(User, { id: req.user?.id ? req.user.id : '' }),
+      friend: getManager().create(User, { id: req.params.id }),
+    });
+
+    getCustomRepository(UserFriendRepository)
+      .deleteOrFail(userFriend)
+      .then(() => {
+        logger.info(`Deleted User Friend ${userFriend.friend.id} for ${userFriend.user.id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK);
+      })
+      .catch((ex) => {
+        logger.warn(
+          `Failed to delete User Friend ${userFriend.friend.id} for ${userFriend.user.id} due to ${ex.message}`
+        );
+
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
 }
