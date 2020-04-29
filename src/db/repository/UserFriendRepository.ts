@@ -7,6 +7,7 @@ import {
   // eslint-disable-next-line no-unused-vars
   SaveOptions,
   Not,
+  getManager,
   // eslint-disable-next-line no-unused-vars
   DeleteResult,
 } from 'typeorm';
@@ -20,28 +21,10 @@ import User from '@app/db/entity/User';
 
 @EntityRepository(UserFriend)
 export default class UserFriendRepository extends AbstractRepository<UserFriend> {
-  public saveOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
-    const callback = async (em: EntityManager) => {
-      const userFriendFrom: UserFriend = em.create(UserFriend, {
-        user: userFriend.user,
-        friend: userFriend.friend,
-        type: UserFriendType.WAITING_ACCEPTANCE,
-      });
-      const userFriendTo: UserFriend = em.create(UserFriend, {
-        user: userFriend.friend,
-        friend: userFriend.user,
-        type: UserFriendType.FRIEND_REQUEST,
-      });
-
-      await UserFriendRepository.saveUnique(userFriendTo, em);
-      return UserFriendRepository.saveUnique(userFriendFrom, em);
-    };
-
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
-  }
-
-  public updateOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
+  public static findFriendMatch(
+    userFriend: UserFriend,
+    entityManager?: EntityManager
+  ): Promise<{ from: UserFriend; to: UserFriend }> {
     const callback = async (em: EntityManager) => {
       const userFriendFrom: UserFriend = await em
         .findOneOrFail(
@@ -76,38 +59,57 @@ export default class UserFriendRepository extends AbstractRepository<UserFriend>
           return _friend;
         });
 
+      return { from: userFriendFrom, to: userFriendTo };
+    };
+
+    return callback(entityManager === undefined ? getManager() : entityManager);
+  }
+
+  public saveOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
+    const callback = async (em: EntityManager) => {
+      const userFriendFrom: UserFriend = em.create(UserFriend, {
+        user: userFriend.user,
+        friend: userFriend.friend,
+        type: UserFriendType.WAITING_ACCEPTANCE,
+      });
+      const userFriendTo: UserFriend = em.create(UserFriend, {
+        user: userFriend.friend,
+        friend: userFriend.user,
+        type: UserFriendType.FRIEND_REQUEST,
+      });
+
+      await UserFriendRepository.saveUnique(userFriendTo, em);
+      return UserFriendRepository.saveUnique(userFriendFrom, em);
+    };
+
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
+  }
+
+  public updateOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
+    const callback = async (em: EntityManager) => {
+      const friendMatch = await UserFriendRepository.findFriendMatch(userFriend, em);
+
       switch (true) {
         case userFriend.type === UserFriendType.FRIEND &&
-          userFriendFrom.type === UserFriendType.FRIEND_REQUEST &&
-          userFriendTo.type === UserFriendType.WAITING_ACCEPTANCE: {
+          friendMatch.from.type === UserFriendType.FRIEND_REQUEST &&
+          friendMatch.to.type === UserFriendType.WAITING_ACCEPTANCE: {
           // Friend request accepted
-          await em.merge(UserFriend, userFriendFrom, { type: UserFriendType.FRIEND });
-          await em.merge(UserFriend, userFriendTo, { type: UserFriendType.FRIEND });
+          await em.merge(UserFriend, friendMatch.from, { type: UserFriendType.FRIEND });
+          await em.merge(UserFriend, friendMatch.to, { type: UserFriendType.FRIEND });
           break;
         }
         case userFriend.type === UserFriendType.BLOCKED &&
-          userFriendFrom.type === UserFriendType.FRIEND: {
+          friendMatch.from.type === UserFriendType.FRIEND: {
           // Friend blocked
-          await em.merge(UserFriend, userFriendFrom, { type: UserFriendType.BLOCKED });
+          await em.merge(UserFriend, friendMatch.from, { type: UserFriendType.BLOCKED });
           break;
         }
         case userFriend.type === UserFriendType.FRIEND &&
-          userFriendFrom.type === UserFriendType.BLOCKED: {
+          friendMatch.from.type === UserFriendType.BLOCKED: {
           // Friend unblocked
-          await em.merge(UserFriend, userFriendFrom, { type: UserFriendType.FRIEND });
-          break;
-        }
-        case userFriend.type === UserFriendType.DELETED &&
-          (userFriendFrom.type === UserFriendType.FRIEND ||
-            userFriendFrom.type === UserFriendType.BLOCKED): {
-          // Friend deleted
-          await em.merge(UserFriend, userFriendFrom, { type: UserFriendType.DELETED });
-          break;
-        }
-        case userFriend.type === UserFriendType.FRIEND &&
-          userFriendFrom.type === UserFriendType.DELETED: {
-          // Friend undeleted
-          await em.merge(UserFriend, userFriendFrom, { type: UserFriendType.FRIEND });
+          await em.merge(UserFriend, friendMatch.from, { type: UserFriendType.FRIEND });
           break;
         }
         default: {
@@ -115,24 +117,30 @@ export default class UserFriendRepository extends AbstractRepository<UserFriend>
         }
       }
 
-      await UserFriendRepository.updateUnique(userFriendTo, em);
-      return UserFriendRepository.updateUnique(userFriendFrom, em);
+      await UserFriendRepository.updateUnique(friendMatch.to, em);
+      return UserFriendRepository.updateUnique(friendMatch.from, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
-  public deleteOrFail(userFriend: UserFriend, entityManager?: EntityManager): Promise<UserFriend> {
+  public deleteOrFail(
+    userFriend: UserFriend,
+    entityManager?: EntityManager
+  ): Promise<DeleteResult> {
     const callback = async (em: EntityManager) => {
-      // eslint-disable-next-line no-param-reassign
-      userFriend.type = UserFriendType.DELETED;
+      await UserFriendRepository.findFriendMatch(userFriend);
 
-      return this.updateOrFail(userFriend, em);
+      await em.delete(UserFriend, { user: userFriend.friend, friend: userFriend.user });
+
+      return em.delete(UserFriend, { user: userFriend.user, friend: userFriend.friend });
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   private static async saveUnique(

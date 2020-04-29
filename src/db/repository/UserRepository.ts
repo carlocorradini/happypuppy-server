@@ -87,8 +87,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return Promise.resolve(newUser);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
@@ -98,8 +99,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return UserRepository.updateUnique(userToUpdate, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateAvataOrFail(
@@ -117,8 +119,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return this.updateOrFail(user, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
@@ -127,8 +130,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return em.delete(User, user.id);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   private static async saveUnique(

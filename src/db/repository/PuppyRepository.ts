@@ -50,8 +50,10 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
 
       return PuppyRepository.saveUnique(puppy, em);
     };
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<Puppy> {
@@ -69,8 +71,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
       return PuppyRepository.updateUnique(puppyToUpdate, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateAvataOrFail(
@@ -88,8 +91,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
       return this.updateOrFail(puppy, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public deleteOrFail(puppy: Puppy, entityManager?: EntityManager): Promise<DeleteResult> {
@@ -100,8 +104,9 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
       return em.delete(Puppy, puppy.id);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   private static async saveUnique(

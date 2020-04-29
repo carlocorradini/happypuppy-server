@@ -39,8 +39,9 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
       return Promise.resolve(userPasswordReset);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public change(
@@ -69,7 +70,8 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
       return getCustomRepository(UserRepository).updateOrFail(foundUserPasswordReset.user, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 }

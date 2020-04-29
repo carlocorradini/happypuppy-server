@@ -19,8 +19,6 @@ export enum UserFriendType {
   FRIEND_REQUEST = 'friend_request',
   // eslint-disable-next-line no-unused-vars
   WAITING_ACCEPTANCE = 'waiting_acceptance',
-  // eslint-disable-next-line no-unused-vars
-  DELETED = 'deleted',
 }
 
 @Entity('user_friend')
