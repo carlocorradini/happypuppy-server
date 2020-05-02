@@ -1,14 +1,84 @@
+/* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getRepository, getCustomRepository, getManager } from 'typeorm';
+import { getRepository, getCustomRepository, getManager, Between } from 'typeorm';
+import moment from 'moment';
 import logger from '@app/logger';
 import Puppy from '@app/db/entity/Puppy';
 import PuppyRepository from '@app/db/repository/PuppyRepository';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 import { DuplicateEntityError } from '@app/common/error';
 import User from '@app/db/entity/User';
+import { StringUtil, ArrayUtil } from '@app/util';
 
 export default class PuppyController {
+  public static all(req: Request, res: Response): void {
+    const {
+      limit,
+      offset,
+      sort,
+      sort_order,
+      id,
+      name,
+      gender,
+      date_of_birth,
+      weight,
+      user,
+      specie,
+      breeds,
+      personalities,
+      created_at,
+    } = req.query;
+
+    const breedsArray: number[] = StringUtil.toNumberArray(breeds as string);
+    const personalitiesArray: number[] = StringUtil.toNumberArray(personalities as string);
+
+    getManager()
+      .find(Puppy, {
+        ...(limit !== undefined && { take: (limit as unknown) as number }),
+        ...(offset !== undefined && { skip: (offset as unknown) as number }),
+        ...(sort !== undefined &&
+          sort_order !== undefined && {
+            order: {
+              [sort as keyof Puppy]: sort_order,
+            },
+          }),
+        loadRelationIds: true,
+        where: {
+          ...(id !== undefined && { id }),
+          ...(name !== undefined && { name }),
+          ...(gender !== undefined && { gender }),
+          ...(date_of_birth !== undefined && { date_of_birth }),
+          ...(weight !== undefined && { weight }),
+          ...(user !== undefined && { user }),
+          ...(specie !== undefined && { specie }),
+          ...(created_at !== undefined && {
+            created_at: Between(
+              moment(`${created_at}T00:00:00.000`),
+              moment(`${created_at}T23:59:59.999`)
+            ),
+          }),
+        },
+      })
+      .then((puppies) => {
+        // eslint-disable-next-line no-param-reassign
+        puppies = puppies.filter(
+          (puppy) =>
+            ArrayUtil.contains(puppy.breeds, breedsArray) &&
+            ArrayUtil.contains(puppy.personalities, personalitiesArray)
+        );
+
+        logger.info(`Found ${puppies.length} Puppies`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, puppies);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to find Puppies due to ${ex.message}`);
+
+        ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
   public static find(req: Request, res: Response): void {
     const { id } = req.params;
 

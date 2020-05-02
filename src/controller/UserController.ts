@@ -93,8 +93,7 @@ export default class UserController {
       .catch((ex) => {
         logger.warn(`Failed sending reset password request for User ${email} due to ${ex.message}`);
 
-        // Return 200 if NOT FOUND due to security risks
-        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.OK);
+        if (ex.name === 'EntityNotFound') ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
         else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
       });
   }
