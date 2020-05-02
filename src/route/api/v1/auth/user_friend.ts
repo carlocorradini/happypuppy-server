@@ -6,7 +6,7 @@ import UserFriend, { UserFriendValidationGroup } from '@app/db/entity/UserFriend
 
 const router = Router();
 
-router.get('', UserFriendController.all);
+router.get('', UserFriendController.find);
 
 router.get(
   '/:id',
@@ -19,7 +19,7 @@ router.get(
       },
     })
   ),
-  UserFriendController.find
+  UserFriendController.findById
 );
 
 router.post(

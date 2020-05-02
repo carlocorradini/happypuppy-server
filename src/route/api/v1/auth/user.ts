@@ -78,7 +78,7 @@ router.get(
       },
     })
   ),
-  UserController.all
+  UserController.find
 );
 
 router.get(
@@ -92,7 +92,7 @@ router.get(
       },
     })
   ),
-  UserController.find
+  UserController.findById
 );
 
 router.post(

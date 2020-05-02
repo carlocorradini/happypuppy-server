@@ -5,7 +5,7 @@ import { AnimalBreedController } from '@app/controller';
 
 const router = Router();
 
-router.get('', AnimalBreedController.all);
+router.get('', AnimalBreedController.find);
 
 router.get(
   '/:id',
@@ -18,7 +18,7 @@ router.get(
       },
     })
   ),
-  AnimalBreedController.find
+  AnimalBreedController.findById
 );
 
 export default router;

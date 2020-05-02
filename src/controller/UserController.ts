@@ -17,7 +17,7 @@ import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 import UserPasswordReset from '@app/db/entity/UserPasswordReset';
 
 export default class UserController {
-  public static all(req: Request, res: Response): void {
+  public static find(req: Request, res: Response): void {
     const {
       limit,
       offset,
@@ -72,7 +72,7 @@ export default class UserController {
       });
   }
 
-  public static find(req: Request, res: Response): void {
+  public static findById(req: Request, res: Response): void {
     const { id } = req.params;
 
     getCustomRepository(UserRepository)

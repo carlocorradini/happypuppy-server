@@ -9,7 +9,7 @@ import UserFriendRepository from '@app/db/repository/UserFriendRepository';
 import { DuplicateEntityError } from '@app/common/error';
 
 export default class UserFriendController {
-  public static all(req: Request, res: Response): void {
+  public static find(req: Request, res: Response): void {
     const user: User = getManager().create(User, { id: req.user?.id ? req.user.id : '' });
 
     getManager()
@@ -29,7 +29,7 @@ export default class UserFriendController {
       });
   }
 
-  public static find(req: Request, res: Response): void {
+  public static findById(req: Request, res: Response): void {
     const user: User = getManager().create(User, { id: req.user?.id ? req.user.id : '' });
     const friend: User = getManager().create(User, { id: req.params.id });
 

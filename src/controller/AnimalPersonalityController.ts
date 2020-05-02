@@ -6,7 +6,7 @@ import Personality from '@app/db/entity/AnimalPersonality';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class AnimalPersonalityController {
-  public static all(_req: Request, res: Response): void {
+  public static find(_req: Request, res: Response): void {
     getManager()
       .find(Personality)
       .then((personalities) => {
@@ -21,7 +21,7 @@ export default class AnimalPersonalityController {
       });
   }
 
-  public static find(req: Request, res: Response): void {
+  public static findById(req: Request, res: Response): void {
     const { id } = req.params;
 
     getManager()

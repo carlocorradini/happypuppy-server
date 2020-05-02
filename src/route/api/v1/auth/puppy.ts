@@ -97,7 +97,7 @@ router.get(
       },
     })
   ),
-  PuppyController.all
+  PuppyController.find
 );
 
 router.get(
@@ -111,7 +111,7 @@ router.get(
       },
     })
   ),
-  PuppyController.find
+  PuppyController.findById
 );
 
 router.post(

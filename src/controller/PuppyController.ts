@@ -12,7 +12,7 @@ import User from '@app/db/entity/User';
 import { StringUtil, ArrayUtil } from '@app/util';
 
 export default class PuppyController {
-  public static all(req: Request, res: Response): void {
+  public static find(req: Request, res: Response): void {
     const {
       limit,
       offset,
@@ -79,7 +79,7 @@ export default class PuppyController {
       });
   }
 
-  public static find(req: Request, res: Response): void {
+  public static findById(req: Request, res: Response): void {
     const { id } = req.params;
 
     getRepository(Puppy)
