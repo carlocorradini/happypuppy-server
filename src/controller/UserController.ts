@@ -1,6 +1,8 @@
+/* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getCustomRepository, getManager } from 'typeorm';
+import { getCustomRepository, getManager, Between } from 'typeorm';
+import moment from 'moment';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
 import UserRepository from '@app/db/repository/UserRepository';
@@ -15,6 +17,61 @@ import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 import UserPasswordReset from '@app/db/entity/UserPasswordReset';
 
 export default class UserController {
+  public static all(req: Request, res: Response): void {
+    const {
+      limit,
+      offset,
+      sort,
+      sort_order,
+      id,
+      username,
+      role,
+      name,
+      surname,
+      gender,
+      date_of_birth,
+      created_at,
+    } = req.query;
+
+    getManager()
+      .find(User, {
+        ...(limit !== undefined && { take: (limit as unknown) as number }),
+        ...(offset !== undefined && { skip: (offset as unknown) as number }),
+        ...(sort !== undefined &&
+          sort_order !== undefined && {
+            order: {
+              [sort as keyof User]: sort_order,
+            },
+          }),
+        loadRelationIds: true,
+        where: {
+          ...(id !== undefined && { id }),
+          ...(username !== undefined && { username }),
+          ...(role !== undefined && { role }),
+          ...(name !== undefined && { name }),
+          ...(surname !== undefined && { surname }),
+          ...(gender !== undefined && { gender }),
+          ...(date_of_birth !== undefined && { date_of_birth }),
+          ...(created_at !== undefined && {
+            created_at: Between(
+              moment(`${created_at}T00:00:00.000`),
+              moment(`${created_at}T23:59:59.999`)
+            ),
+          }),
+        },
+      })
+      .then((users) => {
+        logger.info(`Found ${users.length} Users`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, users);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to find Users due to ${ex.message}`);
+
+        ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
   public static find(req: Request, res: Response): void {
     const { id } = req.params;
 

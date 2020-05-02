@@ -49,7 +49,7 @@ router.get(
       },
       gender: {
         in: ['query'],
-        isIn: { options: Object.keys(PuppyGender) },
+        isIn: { options: [Object.values(PuppyGender)] },
         optional: true,
       },
       date_of_birth: {

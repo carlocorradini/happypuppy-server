@@ -144,7 +144,7 @@ export default class User {
   @IsEmpty({ always: true })
   friends!: UserFriend[];
 
-  @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @CreateDateColumn({ name: 'created_at', update: false })
   @IsEmpty({ always: true })
   created_at!: Date;
 
