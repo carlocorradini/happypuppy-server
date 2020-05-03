@@ -80,7 +80,7 @@ router.get(
   ),
   UserController.find
 );
-
+router.get('/me', UserController.me);
 router.get(
   '/:id',
   ValidatorMiddleware.validateChain(

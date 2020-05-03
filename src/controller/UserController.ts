@@ -78,14 +78,37 @@ export default class UserController {
     getCustomRepository(UserRepository)
       .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
       .then((user) => {
-        logger.info(`Found User ${user.id}`);
-
         // eslint-disable-next-line no-param-reassign
         delete user.friends;
+
+        logger.info(`Found User ${user.id}`);
+
         ResponseHelper.send(res, HttpStatusCode.OK, user);
       })
       .catch((ex) => {
         logger.warn(`Failed to find User ${id} due to ${ex.message}`);
+
+        if (ex.name === 'EntityNotFound' || ex instanceof UserNotVerifiedError)
+          ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);
+        else ResponseHelper.send(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      });
+  }
+
+  public static me(req: Request, res: Response): void {
+    const id = req.user?.id ? req.user.id : '';
+
+    getCustomRepository(UserRepository)
+      .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
+      .then((user) => {
+        // eslint-disable-next-line no-param-reassign
+        delete user.friends;
+
+        logger.info(`Found User me ${user.id}`);
+
+        ResponseHelper.send(res, HttpStatusCode.OK, user);
+      })
+      .catch((ex) => {
+        logger.warn(`Failed to find User me ${id} due to ${ex.message}`);
 
         if (ex.name === 'EntityNotFound' || ex instanceof UserNotVerifiedError)
           ResponseHelper.send(res, HttpStatusCode.NOT_FOUND);

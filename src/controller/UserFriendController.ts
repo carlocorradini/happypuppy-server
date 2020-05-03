@@ -93,7 +93,7 @@ export default class UserFriendController {
       .then((newUserFriend) => {
         logger.info(`Created User Friend ${newUserFriend.friend.id} of ${newUserFriend.user.id}`);
 
-        ResponseHelper.send(res, HttpStatusCode.CREATED);
+        ResponseHelper.send(res, HttpStatusCode.CREATED, newUserFriend.friend.id);
       })
       .catch((ex) => {
         logger.warn(
