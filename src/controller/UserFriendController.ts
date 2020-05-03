@@ -1,6 +1,8 @@
+/* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getManager, getCustomRepository } from 'typeorm';
+import { getManager, getCustomRepository, Between } from 'typeorm';
+import moment from 'moment';
 import UserFriend from '@app/db/entity/UserFriend';
 import User from '@app/db/entity/User';
 import logger from '@app/logger';
@@ -10,12 +12,36 @@ import { DuplicateEntityError } from '@app/common/error';
 
 export default class UserFriendController {
   public static find(req: Request, res: Response): void {
+    const { limit, offset, sort, sort_order, type, created_at } = req.query;
+
     const user: User = getManager().create(User, { id: req.user?.id ? req.user.id : '' });
+    const friend: User | undefined =
+      req.query.friend !== undefined
+        ? getManager().create(User, { id: req.query.friend as string })
+        : undefined;
 
     getManager()
       .find(UserFriend, {
-        where: { user },
+        ...(limit !== undefined && { take: (limit as unknown) as number }),
+        ...(offset !== undefined && { skip: (offset as unknown) as number }),
+        ...(sort !== undefined &&
+          sort_order !== undefined && {
+            order: {
+              [sort as keyof UserFriend]: sort_order,
+            },
+          }),
         loadRelationIds: true,
+        where: {
+          user,
+          ...(friend !== undefined && { friend }),
+          ...(type !== undefined && { type }),
+          ...(created_at !== undefined && {
+            created_at: Between(
+              moment(`${created_at}T00:00:00.000`),
+              moment(`${created_at}T23:59:59.999`)
+            ),
+          }),
+        },
       })
       .then((userFriends) => {
         logger.info(`Found ${userFriends.length} User Friends of ${user.id}`);
