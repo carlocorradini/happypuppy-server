@@ -1,4 +1,15 @@
-import { Entity, Index, Column, PrimaryColumn, Check, OneToMany } from 'typeorm';
+/* eslint-disable camelcase */
+import {
+  Entity,
+  Index,
+  Column,
+  PrimaryColumn,
+  Check,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { IsEmpty } from 'class-validator';
 import AnimalBreed from './AnimalBreed';
 
 @Entity('animal_specie')
@@ -13,4 +24,12 @@ export default class AnimalSpecie {
 
   @OneToMany(() => AnimalBreed, (breed) => breed.specie)
   breeds!: AnimalBreed[];
+
+  @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @IsEmpty({ always: true })
+  created_at!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', select: false })
+  @IsEmpty({ always: true })
+  updated_at!: Date;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
 import { getManager } from 'typeorm';
@@ -6,9 +7,26 @@ import AnimalBreed from '@app/db/entity/AnimalBreed';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 
 export default class AnimalSpecieController {
-  public static all(_req: Request, res: Response): void {
+  public static find(req: Request, res: Response): void {
+    const { limit, offset, sort, sort_order, id, name, specie } = req.query;
+
     getManager()
-      .find(AnimalBreed, { loadRelationIds: true })
+      .find(AnimalBreed, {
+        ...(limit !== undefined && { take: (limit as unknown) as number }),
+        ...(offset !== undefined && { skip: (offset as unknown) as number }),
+        ...(sort !== undefined &&
+          sort_order !== undefined && {
+            order: {
+              [sort as keyof AnimalBreed]: sort_order,
+            },
+          }),
+        loadRelationIds: true,
+        where: {
+          ...(id !== undefined && { id }),
+          ...(name !== undefined && { name }),
+          ...(specie !== undefined && { specie }),
+        },
+      })
       .then((animalBreeds) => {
         logger.info(`Found ${animalBreeds.length} Animal Breeds`);
 
@@ -21,7 +39,7 @@ export default class AnimalSpecieController {
       });
   }
 
-  public static find(req: Request, res: Response): void {
+  public static findById(req: Request, res: Response): void {
     const { id } = req.params;
 
     getManager()

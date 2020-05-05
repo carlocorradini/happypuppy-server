@@ -34,8 +34,9 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
       return foundVerication;
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public saveOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
@@ -71,8 +72,9 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
       return Promise.resolve(userVerification);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public verifyResendOrFail(user: User, entityManager?: EntityManager): Promise<UserVerification> {
@@ -80,8 +82,9 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
       return this.saveOrFail((await this.findOneOrFail(user, em)).user, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public verifyOrFail(
@@ -107,7 +110,8 @@ export default class UserVerificationRepository extends AbstractRepository<UserV
       });
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 }

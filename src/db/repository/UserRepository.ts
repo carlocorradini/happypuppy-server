@@ -37,7 +37,7 @@ export default class UserRepository extends AbstractRepository<User> {
       { select: ['id', 'username', 'password', 'verified'] }
     );
     await CryptUtil.compareOrFail(user.password, foundUser.password);
-    if (!foundUser.verified) throw new UserNotVerifiedError('User not verified');
+    if (!foundUser.verified) throw new UserNotVerifiedError('User not verified', foundUser.id);
     return JWTHelper.sign({
       id: foundUser.id,
       role: foundUser.role,
@@ -76,6 +76,7 @@ export default class UserRepository extends AbstractRepository<User> {
       maybeOptions
     );
     if (!user.verified) throw new UserNotVerifiedError('User not verified');
+
     return Promise.resolve(user);
   }
 
@@ -86,8 +87,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return Promise.resolve(newUser);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateOrFail(user: User, entityManager?: EntityManager): Promise<User> {
@@ -97,8 +99,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return UserRepository.updateUnique(userToUpdate, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public updateAvataOrFail(
@@ -116,8 +119,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return this.updateOrFail(user, em);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   public deleteOrFail(user: User, entityManager?: EntityManager): Promise<DeleteResult> {
@@ -126,8 +130,9 @@ export default class UserRepository extends AbstractRepository<User> {
       return em.delete(User, user.id);
     };
 
-    if (entityManager === undefined) return this.manager.transaction(callback);
-    return callback(entityManager);
+    return entityManager === undefined
+      ? this.manager.transaction(callback)
+      : callback(entityManager);
   }
 
   private static async saveUnique(
@@ -157,6 +162,20 @@ export default class UserRepository extends AbstractRepository<User> {
         }
       });
     });
+
+    if (
+      !isUpdateOperation &&
+      (await entityManager.findOne(User, {
+        where: {
+          id: user.id,
+        },
+      })) !== undefined
+    ) {
+      duplicateFields.add({
+        property: `id`,
+        value: user.id,
+      });
+    }
 
     if (duplicateFields.size !== 0)
       throw new DuplicateEntityError(`Duplicate User entity found`, Array.from(duplicateFields));

@@ -166,10 +166,12 @@ export default class Puppy {
   @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   personalities!: AnimalPersonality[];
 
-  @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @CreateDateColumn({ name: 'created_at', update: false })
+  @IsEmpty({ always: true })
   created_at!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', select: false })
+  @IsEmpty({ always: true })
   updated_at!: Date;
 
   @BeforeInsert()

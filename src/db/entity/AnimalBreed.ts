@@ -1,4 +1,16 @@
-import { Entity, Index, Column, PrimaryColumn, Check, ManyToOne, JoinColumn } from 'typeorm';
+/* eslint-disable camelcase */
+import {
+  Entity,
+  Index,
+  Column,
+  PrimaryColumn,
+  Check,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { IsEmpty } from 'class-validator';
 import AnimalSpecie from './AnimalSpecie';
 
 @Entity('animal_breed')
@@ -17,4 +29,12 @@ export default class AnimalBreed {
   })
   @JoinColumn({ name: 'specie_id' })
   specie!: AnimalSpecie;
+
+  @CreateDateColumn({ name: 'created_at', select: false, update: false })
+  @IsEmpty({ always: true })
+  created_at!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', select: false })
+  @IsEmpty({ always: true })
+  updated_at!: Date;
 }

@@ -1,10 +1,104 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
-import Puppy, { PuppyValidationGroup } from '@app/db/entity/Puppy';
+import Puppy, { PuppyValidationGroup, PuppyGender } from '@app/db/entity/Puppy';
 import { PuppyController } from '@app/controller';
 import { ValidatorMiddleware, FileMiddleware } from '@app/middleware';
+import { IsNumberArray } from '@app/common/validator/chain';
 
 const router = Router();
+
+router.get(
+  '',
+  ValidatorMiddleware.validateChain(
+    checkSchema({
+      limit: {
+        in: ['query'],
+        isInt: true,
+        toInt: true,
+        optional: true,
+      },
+      offset: {
+        in: ['query'],
+        isInt: true,
+        toInt: true,
+        optional: true,
+      },
+      sort: {
+        in: ['query'],
+        isString: true,
+        optional: true,
+      },
+      sort_order: {
+        in: ['query'],
+        isString: true,
+        isIn: {
+          options: ['ASC, DESC'],
+        },
+        optional: true,
+      },
+      id: {
+        in: ['query'],
+        isInt: true,
+        toInt: true,
+        optional: true,
+      },
+      name: {
+        in: ['query'],
+        isString: true,
+        optional: true,
+      },
+      gender: {
+        in: ['query'],
+        isIn: { options: [Object.values(PuppyGender)] },
+        optional: true,
+      },
+      date_of_birth: {
+        in: ['query'],
+        isISO8601: true,
+        optional: true,
+      },
+      weight: {
+        in: ['query'],
+        isInt: true,
+        toInt: true,
+        optional: true,
+      },
+      user: {
+        in: ['query'],
+        isUUID: true,
+        optional: true,
+      },
+      specie: {
+        in: ['query'],
+        isInt: true,
+        toInt: true,
+        optional: true,
+      },
+      created_at: {
+        in: ['query'],
+        isISO8601: true,
+        optional: true,
+      },
+      breeds: {
+        in: ['query'],
+        isString: true,
+        custom: {
+          options: IsNumberArray,
+        },
+        optional: true,
+      },
+      personalities: {
+        in: ['query'],
+        isString: true,
+        custom: {
+          options: IsNumberArray,
+        },
+        optional: true,
+      },
+    })
+  ),
+  PuppyController.find
+);
 
 router.get(
   '/:id',
@@ -17,7 +111,7 @@ router.get(
       },
     })
   ),
-  PuppyController.find
+  PuppyController.findById
 );
 
 router.post(

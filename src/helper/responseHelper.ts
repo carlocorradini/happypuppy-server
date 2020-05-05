@@ -27,14 +27,8 @@ export default class ResponseHelper {
         is_success: httpStatusCode.isSuccess(),
         status_code: httpStatusCode.code,
         status_code_name: httpStatusCode.name,
-        data: this.data(httpStatusCode, data),
+        data,
       })
       .end();
-  }
-
-  private static data(httpStatusCode: HttpStatusCode, data: any): object | undefined {
-    if (data === undefined || httpStatusCode.isSuccess()) return data;
-
-    return { errors: Array.isArray(data) ? data : [data] };
   }
 }
