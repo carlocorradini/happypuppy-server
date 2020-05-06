@@ -172,6 +172,7 @@ export default class User {
 
   @BeforeInsert()
   defaultAvatar() {
+    if (!this.gender) this.gender = UserGender.UNKNOWN;
     this.avatar = `https://res.cloudinary.com/dxiqa0xwa/image/upload/v1586709310/happypuppy/upload/user/avatar/${this.gender}.png`;
   }
 }
