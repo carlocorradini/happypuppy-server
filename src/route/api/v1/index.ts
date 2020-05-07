@@ -8,6 +8,8 @@ import animal_specie from './animal_specie';
 // eslint-disable-next-line camelcase
 import animal_breed from './animal_breed';
 // eslint-disable-next-line camelcase
+import animal_park from './animal_park';
+// eslint-disable-next-line camelcase
 import user_verification from './user_verification';
 import auth from './auth';
 
@@ -20,6 +22,8 @@ router.use('/animal_personality', animal_personality);
 router.use('/animal_specie', animal_specie);
 
 router.use('/animal_breed', animal_breed);
+
+router.use('/animal_park', animal_park);
 
 router.use(
   '/auth',
