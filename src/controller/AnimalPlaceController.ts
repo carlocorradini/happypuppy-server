@@ -3,17 +3,25 @@
 import { Request, Response } from 'express';
 import { getManager, Between } from 'typeorm';
 import logger from '@app/logger';
-import AnimalPark from '@app/db/entity/AnimalPark';
+import AnimalPark from '@app/db/entity/AnimalPlace';
 import { ResponseHelper, HttpStatusCode } from '@app/helper';
 // eslint-disable-next-line no-unused-vars
 import GisUtil, { BoundingBox } from '@app/util/GisUtil';
 
-export default class AnimalParkController {
-  /**
-   * @see https://www.movable-type.co.uk/scripts/latlong-db.html
-   */
+export default class AnimalPlaceController {
   public static find(req: Request, res: Response): void {
-    const { limit, offset, sort, sort_order, id, name, latitude, longitude, radius } = req.query;
+    const {
+      limit,
+      offset,
+      sort,
+      sort_order,
+      id,
+      name,
+      type,
+      latitude,
+      longitude,
+      radius,
+    } = req.query;
 
     const boundingBox: BoundingBox | undefined =
       latitude !== undefined && longitude !== undefined && radius !== undefined
@@ -37,6 +45,7 @@ export default class AnimalParkController {
         where: {
           ...(id !== undefined && { id }),
           ...(name !== undefined && { name }),
+          ...(type !== undefined && { type }),
           ...(boundingBox !== undefined && {
             latitude: Between(boundingBox.min.latitude, boundingBox.max.latitude),
             longitude: Between(boundingBox.min.longitude, boundingBox.max.longitude),

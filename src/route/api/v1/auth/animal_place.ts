@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { checkSchema } from 'express-validator';
 import { ValidatorMiddleware } from '@app/middleware';
-import { AnimalParkController } from '@app/controller';
+import { AnimalPlaceController } from '@app/controller';
+import { AnimalPlaceType } from '@app/db/entity/AnimalPlace';
 
 const router = Router();
 
@@ -45,6 +46,11 @@ router.get(
         isString: true,
         optional: true,
       },
+      type: {
+        in: ['query'],
+        isIn: { options: [Object.values(AnimalPlaceType)] },
+        optional: true,
+      },
       latitude: {
         in: ['query'],
         isFloat: true,
@@ -65,7 +71,7 @@ router.get(
       },
     })
   ),
-  AnimalParkController.find
+  AnimalPlaceController.find
 );
 
 router.get(
@@ -79,7 +85,7 @@ router.get(
       },
     })
   ),
-  AnimalParkController.findById
+  AnimalPlaceController.findById
 );
 
 export default router;
