@@ -1,5 +1,3 @@
-/* eslint-disable no-dupe-class-members */
-// eslint-disable-next-line no-unused-vars
 import {
   AbstractRepository,
   EntityRepository,
