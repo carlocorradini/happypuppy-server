@@ -1,5 +1,13 @@
 /* eslint-disable camelcase */
-import { Entity, ManyToOne, JoinColumn, UpdateDateColumn, CreateDateColumn, Column } from 'typeorm';
+import {
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+  Column,
+  Check,
+} from 'typeorm';
 import { IsEmpty, IsUUID, IsEnum, IsOptional } from 'class-validator';
 import User from './User';
 
@@ -22,6 +30,7 @@ export enum UserFriendType {
 }
 
 @Entity('user_friend')
+@Check(`"user_id" <> "friend_id"`)
 export default class UserFriend {
   @ManyToOne(() => User, { primary: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
