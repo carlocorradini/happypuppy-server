@@ -24,7 +24,7 @@ export default class UserPasswordResetRepository extends AbstractRepository<User
       );
       // TODO Change from
       await EmailService.send({
-        from: '"Happy Puppy" <password_reset@happypuppy.com>',
+        from: '"Happy Puppy" <password.reset@happypuppy.com>',
         to: user.email,
         subject: 'Happy Puppy password reset',
         // TODO Remove Typescript ignore
