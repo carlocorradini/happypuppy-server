@@ -32,7 +32,7 @@ export default class UserRepository extends AbstractRepository<User> {
     const foundUser: User = await this.manager.findOneOrFail(
       User,
       { username: user.username },
-      { select: ['id', 'username', 'password', 'verified'] }
+      { select: ['id', 'username', 'password', 'role', 'verified'] }
     );
     await CryptUtil.compareOrFail(user.password, foundUser.password);
     if (!foundUser.verified) throw new UserNotVerifiedError('User not verified', foundUser.id);
