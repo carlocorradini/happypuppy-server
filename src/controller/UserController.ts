@@ -15,6 +15,8 @@ import {
 import { ResponseHelper, HttpStatusCode, JWTHelper } from '@app/helper';
 // eslint-disable-next-line no-unused-vars
 import UserPasswordReset from '@app/db/entity/UserPasswordReset';
+// eslint-disable-next-line no-unused-vars
+import UserFriend from '@app/db/entity/UserFriend';
 
 export default class UserController {
   public static find(req: Request, res: Response): void {
@@ -61,6 +63,12 @@ export default class UserController {
         },
       })
       .then((users) => {
+        // eslint-disable-next-line no-param-reassign
+        users = users.map((user) => {
+          // eslint-disable-next-line no-param-reassign
+          user.friends = (user.friends.length as unknown) as UserFriend[];
+          return user;
+        });
         logger.info(`Found ${users.length} Users`);
 
         ResponseHelper.send(res, HttpStatusCode.OK, users);
@@ -79,7 +87,7 @@ export default class UserController {
       .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
       .then((user) => {
         // eslint-disable-next-line no-param-reassign
-        delete user.friends;
+        user.friends = (user.friends.length as unknown) as UserFriend[];
 
         logger.info(`Found User ${user.id}`);
 
