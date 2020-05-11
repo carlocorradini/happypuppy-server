@@ -106,7 +106,6 @@ export default class User {
     type: 'enum',
     enum: UserGender,
     default: UserGender.UNKNOWN,
-    update: false,
   })
   @IsEnum(UserGender, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
