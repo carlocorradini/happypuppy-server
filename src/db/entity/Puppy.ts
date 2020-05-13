@@ -82,8 +82,8 @@ export default class Puppy {
     enum: PuppyGender,
     update: false,
   })
-  @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
-  @IsOptional({ groups: [PuppyValidationGroup.UPDATE] })
+  @IsEnum(PuppyGender, { groups: [PuppyValidationGroup.CREATION] })
+  @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
   gender!: PuppyGender;
 
   @Column({ name: 'date_of_birth', type: 'date', nullable: true, default: undefined })
