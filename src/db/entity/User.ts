@@ -94,13 +94,13 @@ export default class User {
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  name!: string | null;
+  name?: string | null;
 
   @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  surname!: string | null;
+  surname?: string | null;
 
   @Column({
     name: 'gender',
@@ -154,7 +154,7 @@ export default class User {
 
   @BeforeInsert()
   @BeforeUpdate()
-  toNullIfEmpty() {
+  toUndefinedIfEmpty() {
     if (typeof this.name === 'string' && isEmpty(this.name)) this.name = null;
     if (typeof this.surname === 'string' && isEmpty(this.surname)) this.surname = null;
   }
