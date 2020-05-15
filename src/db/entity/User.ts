@@ -94,13 +94,13 @@ export default class User {
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  name!: string;
+  name!: string | undefined;
 
   @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  surname!: string;
+  surname!: string | undefined;
 
   @Column({
     name: 'gender',
@@ -154,9 +154,9 @@ export default class User {
 
   @BeforeInsert()
   @BeforeUpdate()
-  toNullIfEmpty() {
-    if (isEmpty(this.name)) delete this.name;
-    if (isEmpty(this.surname)) delete this.surname;
+  toUndefinedEmpty() {
+    if (typeof this.name === 'string' && isEmpty(this.name)) this.name = undefined;
+    if (typeof this.surname === 'string' && isEmpty(this.surname)) this.surname = undefined;
   }
 
   @BeforeInsert()
