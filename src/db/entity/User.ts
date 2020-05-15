@@ -19,6 +19,7 @@ import {
   IsOptional,
   IsMobilePhone,
   IsISO8601,
+  isEmpty,
 } from 'class-validator';
 import { CryptUtil } from '@app/util';
 import { HasNoWhitespace } from '@app/common/validator';
@@ -91,13 +92,13 @@ export default class User {
 
   @Column({ name: 'name', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  @Length(1, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   name!: string;
 
   @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
-  @Length(1, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
+  @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   surname!: string;
 
@@ -150,6 +151,13 @@ export default class User {
   @UpdateDateColumn({ name: 'updated_at', select: false })
   @IsEmpty({ always: true })
   updated_at!: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  toNullIfEmpty() {
+    if (isEmpty(this.name)) delete this.name;
+    if (isEmpty(this.surname)) delete this.surname;
+  }
 
   @BeforeInsert()
   @BeforeUpdate()
