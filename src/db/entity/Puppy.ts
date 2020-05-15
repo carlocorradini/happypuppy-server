@@ -12,6 +12,7 @@ import {
   ManyToMany,
   JoinTable,
   Check,
+  BeforeUpdate,
 } from 'typeorm';
 import {
   IsString,
@@ -55,7 +56,7 @@ export enum PuppyGender {
 /**
  * Mininum puppy weight in grams
  */
-export const PUPPY_MIN_WEIGHT: number = 1;
+export const PUPPY_MIN_WEIGHT: number = 0;
 /**
  * Maximum puppy weight in grams
  * Weight of a Blue Whale
@@ -96,7 +97,6 @@ export default class Puppy {
 
   @Column({ name: 'weight', type: 'integer', nullable: true, default: undefined })
   @IsInt({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
-  @IsPositive({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @Min(PUPPY_MIN_WEIGHT, {
     groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
@@ -104,7 +104,7 @@ export default class Puppy {
     groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE],
   })
   @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
-  weight!: number;
+  weight?: number | null;
 
   @Column({ name: 'avatar', length: 256 })
   @IsEmpty({ always: true })
@@ -173,6 +173,12 @@ export default class Puppy {
   @UpdateDateColumn({ name: 'updated_at', select: false })
   @IsEmpty({ always: true })
   updated_at!: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  toUndefinedIfEmpty() {
+    if (typeof this.weight === 'number' && this.weight === 0) this.weight = 0;
+  }
 
   @BeforeInsert()
   defaultAvatar() {

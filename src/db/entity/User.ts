@@ -90,13 +90,13 @@ export default class User {
   @IsEmpty({ always: true })
   verified!: boolean;
 
-  @Column({ name: 'name', length: 64, nullable: true, default: undefined })
+  @Column({ name: 'name', type: 'varchar', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   name?: string | null;
 
-  @Column({ name: 'surname', length: 64, nullable: true, default: undefined })
+  @Column({ name: 'surname', type: 'varchar', length: 64, nullable: true, default: undefined })
   @IsString({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @Length(0, 64, { groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
   @IsOptional({ groups: [UserValidationGroup.CREATION, UserValidationGroup.UPDATE] })
