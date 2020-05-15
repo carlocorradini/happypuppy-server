@@ -109,7 +109,7 @@ export default class UserController {
       .findOneAndVerifiedOrFail(id, { loadRelationIds: true })
       .then((user) => {
         // eslint-disable-next-line no-param-reassign
-        delete user.friends;
+        user.friends = (user.friends.length as unknown) as UserFriend[];
 
         logger.info(`Found User me ${user.id}`);
 
