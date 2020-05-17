@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getRepository, getCustomRepository, getManager, Between } from 'typeorm';
+import { getRepository, getCustomRepository, getManager, Between, Like } from 'typeorm';
 import moment from 'moment';
 import logger from '@app/logger';
 import Puppy from '@app/db/entity/Puppy';
@@ -46,7 +46,7 @@ export default class PuppyController {
         loadRelationIds: true,
         where: {
           ...(id !== undefined && { id }),
-          ...(name !== undefined && { name }),
+          ...(name !== undefined && { name: Like(`%${name}%`) }),
           ...(gender !== undefined && { gender }),
           ...(date_of_birth !== undefined && { date_of_birth }),
           ...(weight !== undefined && { weight }),

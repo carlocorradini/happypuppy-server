@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 import { Request, Response } from 'express';
-import { getCustomRepository, getManager, Between } from 'typeorm';
+import { getCustomRepository, getManager, Between, Like } from 'typeorm';
 import moment from 'moment';
 import logger from '@app/logger';
 import User from '@app/db/entity/User';
@@ -48,10 +48,10 @@ export default class UserController {
         loadRelationIds: true,
         where: {
           ...(id !== undefined && { id }),
-          ...(username !== undefined && { username }),
+          ...(username !== undefined && { username: Like(`%${username}%`) }),
           ...(role !== undefined && { role }),
-          ...(name !== undefined && { name }),
-          ...(surname !== undefined && { surname }),
+          ...(name !== undefined && { name: Like(`%${name}%`) }),
+          ...(surname !== undefined && { surname: Like(`%${surname}%`) }),
           ...(gender !== undefined && { gender }),
           ...(date_of_birth !== undefined && { date_of_birth }),
           ...(created_at !== undefined && {
