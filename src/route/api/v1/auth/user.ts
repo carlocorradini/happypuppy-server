@@ -51,6 +51,12 @@ router.get(
         isIn: { options: [Object.values(UserRole)] },
         optional: true,
       },
+      verified: {
+        in: ['query'],
+        isBoolean: true,
+        toBoolean: true,
+        optional: true,
+      },
       name: {
         in: ['query'],
         isString: true,
