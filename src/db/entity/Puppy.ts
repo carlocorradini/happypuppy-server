@@ -133,14 +133,13 @@ export default class Puppy {
       name: 'breed_id',
     },
   })
-  @IsArray({ groups: [PuppyValidationGroup.CREATION] })
-  @ArrayUnique({ groups: [PuppyValidationGroup.CREATION] })
-  @IsInt({ each: true, groups: [PuppyValidationGroup.CREATION] })
-  @IsPositive({ each: true, groups: [PuppyValidationGroup.CREATION] })
+  @IsArray({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @ArrayUnique({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @IsInt({ each: true, groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
+  @IsPositive({ each: true, groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   @IsValidAnimalBreedArray({ groups: [PuppyValidationGroup.CREATION] })
   @IsAnimalBreedArrayBelongToAnimalSpecie({ groups: [PuppyValidationGroup.CREATION] })
-  @IsOptional({ groups: [PuppyValidationGroup.CREATION] })
-  @IsEmpty({ groups: [PuppyValidationGroup.UPDATE] })
+  @IsOptional({ groups: [PuppyValidationGroup.CREATION, PuppyValidationGroup.UPDATE] })
   breeds!: AnimalBreed[];
 
   @ManyToMany(() => AnimalPersonality)
