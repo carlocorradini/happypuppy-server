@@ -59,9 +59,15 @@ export default class PuppyRepository extends AbstractRepository<Puppy> {
     const callback = async (em: EntityManager) => {
       if (puppy.personalities) {
         // eslint-disable-next-line no-param-reassign
-        puppy.personalities = await puppy.personalities.map((id) => {
-          return em.create(Personality, { id: (id as unknown) as number });
-        });
+        puppy.personalities = await puppy.personalities.map((id) =>
+          em.create(Personality, { id: (id as unknown) as number })
+        );
+      }
+      if (puppy.breeds) {
+        // eslint-disable-next-line no-param-reassign
+        puppy.breeds = await puppy.breeds.map((id) =>
+          em.create(AnimalBreed, { id: (id as unknown) as number })
+        );
       }
       const puppyToUpdate: Puppy = await em.findOneOrFail(Puppy, puppy.id, {
         where: { user: puppy.user },
